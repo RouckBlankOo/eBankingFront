@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
   Alert,
@@ -15,19 +15,32 @@ import {
 } from "react-native";
 import { OnboardingBackground } from "../components/UniversalBackground";
 import { useUser } from "../context/UserContext";
+import { RootStackParamList } from "../types";
+import CountrySelector from "../components/CountrySelector";
+import CountryInput from "../components/CountryInput";
 
 const PersonalInformationScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { updateProfileStatus, updateUser } = useUser();
   const [username, setUsername] = useState("example");
   const [firstName, setFirstName] = useState("example");
   const [lastName, setLastName] = useState("example");
   const [dateOfBirth, setDateOfBirth] = useState("00/00/0000");
   const [email, setEmail] = useState("example@gmail.com");
+  const [nationality, setNationality] = useState("Tunisia");
+  const [isNationalityModalVisible, setNationalityModalVisible] =
+    useState(false);
 
   const handleContinue = () => {
     // Basic validation
-    if (!username || !firstName || !lastName || !dateOfBirth || !email) {
+    if (
+      !username ||
+      !firstName ||
+      !lastName ||
+      !dateOfBirth ||
+      !email ||
+      !nationality
+    ) {
       Alert.alert("Error", "Please fill in all required fields");
       return;
     }
@@ -42,7 +55,7 @@ const PersonalInformationScreen = () => {
     updateProfileStatus("personalInformation", true);
 
     // Navigate to Address Information screen
-    navigation.navigate("AddressInformation" as never);
+    navigation.navigate("AddressInformation");
   };
 
   const handleAddPhoto = () => {
@@ -178,6 +191,13 @@ const PersonalInformationScreen = () => {
                     />
                   </View>
                 </View>
+
+                {/* Nationality */}
+                <CountryInput
+                  label="Nationality"
+                  selectedCountry={nationality}
+                  onPress={() => setNationalityModalVisible(true)}
+                />
               </View>
 
               {/* Continue Button */}
@@ -191,6 +211,15 @@ const PersonalInformationScreen = () => {
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
+
+      {/* Country Selector */}
+      <CountrySelector
+        visible={isNationalityModalVisible}
+        onClose={() => setNationalityModalVisible(false)}
+        onSelect={setNationality}
+        selectedCountry={nationality}
+        title="Select Nationality"
+      />
     </OnboardingBackground>
   );
 };

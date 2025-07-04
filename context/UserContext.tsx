@@ -16,7 +16,10 @@ interface UserContextType {
   user: User | null;
   setUser: (user: User | null) => void;
   updateUser: (updates: Partial<User>) => void;
-  updateProfileStatus: (step: keyof User['profileCompletionStatus'], completed: boolean) => void;
+  updateProfileStatus: (
+    step: keyof User["profileCompletionStatus"],
+    completed: boolean
+  ) => void;
   isProfileComplete: () => boolean;
   logout: () => void;
 }
@@ -48,7 +51,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }
   };
 
-  const updateProfileStatus = (step: keyof User['profileCompletionStatus'], completed: boolean) => {
+  const updateProfileStatus = (
+    step: keyof User["profileCompletionStatus"],
+    completed: boolean
+  ) => {
     if (user) {
       setUserState({
         ...user,
@@ -62,7 +68,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
   const isProfileComplete = () => {
     if (!user) return false;
-    const { personalInformation, addressInformation, identityVerification } = user.profileCompletionStatus;
+    const { personalInformation, addressInformation, identityVerification } =
+      user.profileCompletionStatus;
     return personalInformation && addressInformation && identityVerification;
   };
 
@@ -71,14 +78,16 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   };
 
   return (
-    <UserContext.Provider value={{ 
-      user, 
-      setUser, 
-      updateUser, 
-      updateProfileStatus, 
-      isProfileComplete, 
-      logout 
-    }}>
+    <UserContext.Provider
+      value={{
+        user,
+        setUser,
+        updateUser,
+        updateProfileStatus,
+        isProfileComplete,
+        logout,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );

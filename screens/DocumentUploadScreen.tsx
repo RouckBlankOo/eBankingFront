@@ -25,7 +25,7 @@ const DocumentUploadScreen = () => {
     "apartment, suite, etc. (optional)"
   );
   const [issuingCountry, setIssuingCountry] = useState("France");
-  const [nationality, setNationality] = useState("England");
+  const [nationality, setNationality] = useState("France");
   const [expiryDate, setExpiryDate] = useState("00/00/0000");
 
   const handleContinue = () => {

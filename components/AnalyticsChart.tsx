@@ -3,20 +3,10 @@ import { StyleSheet, View } from "react-native";
 import { EmptyState } from "./EmptyState";
 import { ThemedText } from "./ThemedText";
 
-const months = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jul", "Jul", "Sep"];
-
 export const AnalyticsChart: React.FC = () => {
   return (
     <View style={styles.container}>
       <EmptyState message="Nothing Yet" containerStyle={styles.emptyState} />
-
-      <View style={styles.monthLabels}>
-        {months.map((month, index) => (
-          <ThemedText key={index} style={styles.monthLabel}>
-            {month}
-          </ThemedText>
-        ))}
-      </View>
     </View>
   );
 };

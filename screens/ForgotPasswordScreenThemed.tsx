@@ -35,7 +35,9 @@ const ForgotPasswordScreenThemed = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `${CONSTANTS.API_URL_PROD}/auth/forgot-password`,
+        `${
+          CONSTANTS.API_URL_DEV || CONSTANTS.API_URL_PROD
+        }/auth/forgot-password`,
         {
           method: "POST",
           headers: {

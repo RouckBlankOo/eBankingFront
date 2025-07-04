@@ -1,5 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import React from "react";
 import {
   SafeAreaView,
@@ -8,19 +13,16 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { RootStackParamList } from "../types";
 import { OnboardingBackground } from "./UniversalBackground";
 
-interface SecurityVerificationRouteParams {
-  actionName?: string;
-}
-
 type SecurityVerificationRouteProp = RouteProp<
-  { SecurityVerification: SecurityVerificationRouteParams },
-  'SecurityVerification'
+  RootStackParamList,
+  "SecurityVerification"
 >;
 
 const SecurityVerificationScreen: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<SecurityVerificationRouteProp>();
   const actionName = route.params?.actionName || "deposit";
 
@@ -30,7 +32,7 @@ const SecurityVerificationScreen: React.FC = () => {
 
   const handleIdentityVerification = () => {
     // Navigate to Personal Information screen to start verification
-    navigation.navigate("PersonalInformation" as never);
+    navigation.navigate("PersonalInformation");
   };
 
   return (

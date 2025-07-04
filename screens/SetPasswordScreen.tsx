@@ -18,10 +18,13 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  ActivityIndicator,
 } from "react-native";
 import { Snackbar } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RootStackParamList } from "../types";
+import { CONSTANTS } from "../constants";
 
 const { width } = Dimensions.get("window");
 
@@ -44,15 +47,9 @@ const SetPasswordScreen = () => {
   const { setUser } = useUser();
   const insets = useSafeAreaInsets();
 
-  // Generate random user ID like "User-21gh6"
-  const generateRandomUserId = (): string => {
-    const chars = "0123456789abcdefghijklmnopqrstuvwxyz";
-    let result = "User-";
-    for (let i = 0; i < 5; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
-  };
+  // Get params from navigation
+  const { contactInfo, signupMode, userId } = route.params;
+  const API_URL = CONSTANTS.API_URL_DEV || CONSTANTS.API_URL_PROD;
 
   // Password validation requirements
   const getRequirements = (pwd: string): PasswordRequirement[] => [
@@ -106,31 +103,76 @@ const SetPasswordScreen = () => {
       return;
     }
 
+    if (!userId) {
+      setSnackbarMessage("Missing user information. Please try again.");
+      setSnackbarVisible(true);
+      return;
+    }
+
     setIsLoading(true);
+    setSnackbarVisible(false);
 
     try {
-      // Here you would make an API call to set the password
-      console.log("Setting password for user:", password);
+      console.log("Setting password for user:", userId);
 
-      // Generate random user ID
-      const randomUserId = generateRandomUserId();
-
-      // Save user data to context
-      const contactInfo = route.params?.contactInfo || "";
-      const signupMode = route.params?.signupMode || "email";
-
-      setUser({
-        fullName: randomUserId,
-        email: signupMode === "email" ? contactInfo : "",
-        phone: signupMode === "phone" ? contactInfo : "",
-        isAuthenticated: true,
+      const response = await fetch(`${API_URL}/auth/set-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: userId,
+          password: password,
+        }),
       });
 
-      // Navigate to main app immediately (no delay)
-      navigation.navigate("MainApp");
+      const data = await response.json();
+      console.log("Set password response:", data);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to set password");
+      }
+
+      // Store JWT token if provided
+      if (data.token) {
+        await AsyncStorage.setItem("jwtToken", data.token);
+        console.log("JWT token stored");
+      }
+
+      // Update user context with backend user data
+      if (data.user) {
+        setUser({
+          fullName: data.user.fullName,
+          email: data.user.email,
+          phone: data.user.phoneNumber || "",
+          isAuthenticated: true,
+          profileCompletionStatus: data.user.profileCompletionStatus || {
+            personalInformation: false,
+            addressInformation: false,
+            identityVerification: false,
+          },
+        });
+      }
+
+      // Show success message
+      setSnackbarMessage("Password set successfully! Welcome to eBanking!");
+      setSnackbarVisible(true);
+
+      // Navigate to main app after a brief delay
+      setTimeout(() => {
+        navigation.navigate("MainApp");
+      }, 2000);
     } catch (error: any) {
-      console.error("Password setup failed:", error);
-      setSnackbarMessage("Failed to create account. Please try again.");
+      console.error("Set password error:", error);
+      if (error.message.includes("Network request failed")) {
+        setSnackbarMessage(
+          "Cannot connect to server. Please check your internet connection."
+        );
+      } else {
+        setSnackbarMessage(
+          error.message || "Failed to set password. Please try again."
+        );
+      }
       setSnackbarVisible(true);
     } finally {
       setIsLoading(false);
@@ -261,9 +303,13 @@ const SetPasswordScreen = () => {
               isLoading
             }
           >
-            <ThemedText style={styles.continueButtonText}>
-              {isLoading ? "Setting Password..." : "Continue"}
-            </ThemedText>
+            {isLoading ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <ThemedText style={styles.continueButtonText}>
+                Continue
+              </ThemedText>
+            )}
           </TouchableOpacity>
         </BlurView>
 

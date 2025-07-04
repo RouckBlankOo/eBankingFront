@@ -26,8 +26,8 @@ const { width, height } = Dimensions.get("window");
 const SignUpScreen = () => {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [countryCode, setCountryCode] = useState("+216");
-  const [signupMode, setSignupMode] = useState<"phone" | "email">("phone");
+  const [countryCode, setCountryCode] = useState("+1");
+  const [signupMode, setSignupMode] = useState<"phone" | "email">("email");
   const [isModalVisible, setModalVisible] = useState(false);
   const [isVerificationModalVisible, setVerificationModalVisible] =
     useState(false);
@@ -47,24 +47,13 @@ const SignUpScreen = () => {
     { name: "United Kingdom", code: "+44", flag: "🇬🇧" },
   ];
 
-  const handleCreateAccount = async () => {
+  const handleCreateAccount = () => {
     setSnackbarVisible(false);
     setSnackbarMessage("");
 
     // Validation
-    if (signupMode === "phone") {
-      if (!phone) {
-        setSnackbarMessage("Phone number is required");
-        setSnackbarVisible(true);
-        return;
-      }
-      if (!/^\d{8,15}$/.test(phone)) {
-        setSnackbarMessage("Please enter a valid phone number");
-        setSnackbarVisible(true);
-        return;
-      }
-    } else {
-      if (!email) {
+    if (signupMode === "email") {
+      if (!email.trim()) {
         setSnackbarMessage("Email address is required");
         setSnackbarVisible(true);
         return;
@@ -74,13 +63,24 @@ const SignUpScreen = () => {
         setSnackbarVisible(true);
         return;
       }
+    } else {
+      if (!phone.trim()) {
+        setSnackbarMessage("Phone number is required");
+        setSnackbarVisible(true);
+        return;
+      }
+      if (!/^\d{8,15}$/.test(phone)) {
+        setSnackbarMessage("Please enter a valid phone number");
+        setSnackbarVisible(true);
+        return;
+      }
     }
 
-    // Show verification modal
+    // Show verification modal (original flow)
     setVerificationModalVisible(true);
   };
 
-  const handleConfirmPhone = () => {
+  const handleConfirmPhone = async () => {
     const contactInfo =
       signupMode === "phone" ? `${countryCode} ${phone}` : email;
 
@@ -95,11 +95,37 @@ const SignUpScreen = () => {
     // Close modal
     setVerificationModalVisible(false);
 
-    // Navigate to code confirmation screen
-    navigation.navigate("CodeConfirmation", {
-      contactInfo: contactInfo,
-      signupMode: signupMode,
-    });
+    // Here we'll create a placeholder account with minimal info
+    // After verification, we'll collect full details in SetPassword screen
+    try {
+      // Create a placeholder user with just contact info
+      const tempUser = {
+        email:
+          signupMode === "email"
+            ? email.trim().toLowerCase()
+            : `temp_${Date.now()}@placeholder.com`,
+        phoneNumber:
+          signupMode === "phone" ? `${countryCode}${phone}` : "+1000000000",
+        fullName: "Placeholder Name", // Will be updated later
+        password: "TempPassword123!", // Will be updated later
+        isPlaceholder: true,
+      };
+
+      // For now, navigate directly to verification
+      // The backend integration will be handled after verification is complete
+      navigation.navigate("CodeConfirmation", {
+        contactInfo: contactInfo,
+        signupMode: signupMode,
+        tempUserData: tempUser,
+      });
+    } catch (error: any) {
+      console.error("Error creating placeholder user:", error);
+      // Navigate anyway for now - we'll handle this in the verification flow
+      navigation.navigate("CodeConfirmation", {
+        contactInfo: contactInfo,
+        signupMode: signupMode,
+      });
+    }
   };
 
   const handleGoBack = () => {
@@ -188,8 +214,29 @@ const SignUpScreen = () => {
             </TouchableOpacity>
           </View>
 
-          {/* Input Field - Phone or Email */}
-          {signupMode === "phone" ? (
+          {/* Contact Input - Conditional based on signup mode */}
+          {signupMode === "email" ? (
+            <View style={styles.inputWrapper}>
+              <View style={styles.inputContainer}>
+                <Ionicons
+                  name="mail"
+                  size={20}
+                  color={theme.colors.current.textSecondary}
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Email Address"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  placeholderTextColor={theme.colors.current.textSecondary}
+                  value={email}
+                  onChangeText={setEmail}
+                />
+              </View>
+              <View style={styles.inputUnderline} />
+            </View>
+          ) : (
             <View style={styles.inputWrapper}>
               <View style={styles.inputContainer}>
                 <Ionicons
@@ -213,32 +260,11 @@ const SignUpScreen = () => {
                 </TouchableOpacity>
                 <TextInput
                   style={[styles.input, styles.phoneInput]}
-                  placeholder="99 999 999"
+                  placeholder="123 456 7890"
                   keyboardType="phone-pad"
                   placeholderTextColor={theme.colors.current.textSecondary}
                   value={phone}
                   onChangeText={setPhone}
-                />
-              </View>
-              <View style={styles.inputUnderline} />
-            </View>
-          ) : (
-            <View style={styles.inputWrapper}>
-              <View style={styles.inputContainer}>
-                <Ionicons
-                  name="mail"
-                  size={20}
-                  color={theme.colors.current.textSecondary}
-                  style={styles.inputIcon}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="your@email.com"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  placeholderTextColor={theme.colors.current.textSecondary}
-                  value={email}
-                  onChangeText={setEmail}
                 />
               </View>
               <View style={styles.inputUnderline} />

@@ -6,15 +6,20 @@ import SecurityVerificationScreen from "./components/SecurityVerificationScreen"
 import { UserProvider } from "./context/UserContext";
 import AppNavigator from "./navigator/AppNavigator";
 import AddressInformationScreen from "./screens/AddressInformationScreen";
+import AuthTester from "./screens/AuthTester";
 import CodeConfirmationScreen from "./screens/CodeConfirmationScreen";
+import DepositScreen from "./screens/DepositScreen";
 import DocumentUploadScreen from "./screens/DocumentUploadScreen";
 import ForgotPasswordScreen from "./screens/ForgotPasswordScreen";
 import IdentityVerificationScreen from "./screens/IdentityVerificationScreen";
 import LoginScreen from "./screens/LoginScreen";
 import OnBoardingScreen from "./screens/OnBoardingScreen";
 import PersonalInformationScreen from "./screens/PersonalInformationScreen";
+import SelectCurrencyScreen from "./screens/SelectCurrencyScreen";
+import SelectMethodScreen from "./screens/SelectMethodScreen";
 import SetPasswordScreen from "./screens/SetPasswordScreen";
 import SignUpScreen from "./screens/SignUpScreen";
+import VerifyPhoneScreen from "./screens/VerifyPhoneScreen";
 
 const Stack = createStackNavigator();
 
@@ -23,7 +28,15 @@ export default function App() {
     <UserProvider>
       <PaperProvider>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="OnBoardingScreen">
+          <Stack.Navigator initialRouteName="Login">
+            <Stack.Screen
+              name="AuthTester"
+              component={AuthTester}
+              options={{
+                headerShown: true,
+                title: "Authentication Tester",
+              }}
+            />
             <Stack.Screen
               name="OnBoardingScreen"
               component={OnBoardingScreen}
@@ -55,6 +68,11 @@ export default function App() {
               options={{ headerShown: false }}
             />
             <Stack.Screen
+              name="VerifyPhone"
+              component={VerifyPhoneScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
               name="MainApp"
               component={AppNavigator}
               options={{ headerShown: false }}
@@ -82,6 +100,21 @@ export default function App() {
             <Stack.Screen
               name="SecurityVerification"
               component={SecurityVerificationScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="SelectCurrency"
+              component={SelectCurrencyScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="SelectMethod"
+              component={SelectMethodScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Deposit"
+              component={DepositScreen}
               options={{ headerShown: false }}
             />
           </Stack.Navigator>

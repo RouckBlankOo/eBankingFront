@@ -10,6 +10,7 @@ import {
 import { BlurView } from "expo-blur";
 import React, { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Keyboard,
   StyleSheet,
   TextInput,
@@ -20,12 +21,15 @@ import {
 import { Snackbar } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { RootStackParamList } from "../types";
+import { CONSTANTS } from "../constants";
 
 const CodeConfirmationScreen = () => {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [timeLeft, setTimeLeft] = useState(57); // 57 seconds countdown
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isResending, setIsResending] = useState(false);
 
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<RouteProp<RootStackParamList, "CodeConfirmation">>();
@@ -33,7 +37,8 @@ const CodeConfirmationScreen = () => {
   const insets = useSafeAreaInsets();
 
   // Get params from navigation
-  const { contactInfo, signupMode } = route.params;
+  const { contactInfo, signupMode, userId, tempUserData } = route.params;
+  const API_URL = CONSTANTS.API_URL_DEV || CONSTANTS.API_URL_PROD;
 
   // Create masked version of contact info for display
   const getMaskedContactInfo = (info: string) => {
@@ -92,32 +97,196 @@ const CodeConfirmationScreen = () => {
       return;
     }
 
-    // Static verification - any 6-digit code works
-    console.log("Code entered:", enteredCode, "for", contactInfo);
+    setIsLoading(true);
+    setSnackbarVisible(false);
 
-    // Navigate directly to password setup screen
-    navigation.navigate("SetPassword", {
-      contactInfo,
-      signupMode,
-    });
+    try {
+      // NEW FLOW: If we have tempUserData, this is a new signup
+      if (tempUserData) {
+        console.log(
+          "New signup flow - verifying code and creating account:",
+          enteredCode
+        );
+
+        // For now, simulate verification (in real app, you'd verify the code)
+        // Static verification - any 6-digit code works for demo
+
+        // After "verification", create the actual backend user
+        console.log("Creating backend user after verification");
+        const response = await fetch(`${API_URL}/auth/register`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            fullName: tempUserData.fullName,
+            email: tempUserData.email,
+            phoneNumber: tempUserData.phoneNumber,
+            password: tempUserData.password,
+          }),
+        });
+
+        const data = await response.json();
+        console.log("Registration response:", data);
+
+        if (!response.ok) {
+          throw new Error(data.message || "Registration failed");
+        }
+
+        // Show success message
+        setSnackbarMessage(
+          "Phone verified successfully! Please set your password."
+        );
+        setSnackbarVisible(true);
+
+        // Navigate to SetPassword screen with the new userId
+        setTimeout(() => {
+          navigation.navigate("SetPassword", {
+            contactInfo,
+            signupMode,
+            userId: data.data.userId,
+          });
+        }, 1500);
+
+        return;
+      }
+
+      // EXISTING FLOW: User already exists, just verify code
+      if (!userId) {
+        setSnackbarMessage("Missing user information. Please try again.");
+        setSnackbarVisible(true);
+        return;
+      }
+
+      console.log("Verifying code:", enteredCode, "for user:", userId);
+
+      // Determine verification endpoint based on signup mode
+      const endpoint = signupMode === "email" ? "verify-email" : "verify-phone";
+
+      const response = await fetch(`${API_URL}/auth/${endpoint}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: userId,
+          code: enteredCode,
+        }),
+      });
+
+      const data = await response.json();
+      console.log("Verification response:", data);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Verification failed");
+      }
+
+      // Show success message
+      setSnackbarMessage(
+        `${signupMode === "email" ? "Email" : "Phone"} verified successfully!`
+      );
+      setSnackbarVisible(true);
+
+      // Navigate to SetPassword screen or directly to login if both email/phone are verified
+      setTimeout(() => {
+        navigation.navigate("SetPassword", {
+          contactInfo,
+          signupMode,
+          userId,
+        });
+      }, 1500);
+    } catch (error: any) {
+      console.error("Verification error:", error);
+      if (error.message.includes("Network request failed")) {
+        setSnackbarMessage(
+          "Cannot connect to server. Please check your internet connection."
+        );
+      } else if (error.message.includes("Invalid code")) {
+        setSnackbarMessage("Invalid verification code. Please try again.");
+      } else if (error.message.includes("Code expired")) {
+        setSnackbarMessage(
+          "Verification code has expired. Please request a new one."
+        );
+      } else if (error.message.includes("already exists")) {
+        setSnackbarMessage(
+          "An account with this email or phone number already exists"
+        );
+      } else {
+        setSnackbarMessage(
+          error.message || "Verification failed. Please try again."
+        );
+      }
+      setSnackbarVisible(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleResendCode = async () => {
     if (timeLeft > 0) return;
 
+    setIsResending(true);
+    setSnackbarVisible(false);
+
     try {
-      // Here you would make an API call to resend the code
-      console.log("Resending code to:", contactInfo);
+      // NEW FLOW: If we have tempUserData, simulate resending
+      if (tempUserData) {
+        console.log("Simulating resend code for new signup flow");
+        // In a real app, you'd have a service to send verification codes
+        setSnackbarMessage(
+          `New verification code sent to ${getMaskedContactInfo(contactInfo)}`
+        );
+        setSnackbarVisible(true);
+        setTimeLeft(57); // Reset timer
+        return;
+      }
+
+      // EXISTING FLOW: User already exists
+      if (!userId) {
+        setSnackbarMessage("Missing user information. Please try again.");
+        setSnackbarVisible(true);
+        return;
+      }
+
+      console.log("Resending code to:", contactInfo, "for user:", userId);
+
+      const response = await fetch(`${API_URL}/auth/resend-verification`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: userId,
+          type: signupMode, // "email" or "phone"
+        }),
+      });
+
+      const data = await response.json();
+      console.log("Resend response:", data);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to resend code");
+      }
 
       setSnackbarMessage(
-        `New code sent to ${getMaskedContactInfo(contactInfo)}`
+        `New verification code sent to ${getMaskedContactInfo(contactInfo)}`
       );
       setSnackbarVisible(true);
       setTimeLeft(57); // Reset timer
-    } catch (error) {
-      console.error("Resend failed:", error);
-      setSnackbarMessage("Failed to resend code. Please try again.");
+    } catch (error: any) {
+      console.error("Resend code error:", error);
+      if (error.message.includes("Network request failed")) {
+        setSnackbarMessage(
+          "Cannot connect to server. Please check your internet connection."
+        );
+      } else {
+        setSnackbarMessage(
+          error.message || "Failed to resend code. Please try again."
+        );
+      }
       setSnackbarVisible(true);
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -177,12 +346,17 @@ const CodeConfirmationScreen = () => {
           <TouchableOpacity
             style={[
               styles.confirmButton,
-              code.join("").length !== 6 && styles.confirmButtonDisabled,
+              (code.join("").length !== 6 || isLoading) &&
+                styles.confirmButtonDisabled,
             ]}
             onPress={handleConfirmCode}
-            disabled={code.join("").length !== 6}
+            disabled={code.join("").length !== 6 || isLoading}
           >
-            <ThemedText style={styles.confirmButtonText}>Confirm</ThemedText>
+            {isLoading ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <ThemedText style={styles.confirmButtonText}>Confirm</ThemedText>
+            )}
           </TouchableOpacity>
 
           {/* Resend Code */}
@@ -192,15 +366,19 @@ const CodeConfirmationScreen = () => {
             </ThemedText>
             <TouchableOpacity
               onPress={handleResendCode}
-              disabled={timeLeft > 0}
+              disabled={timeLeft > 0 || isResending}
             >
               <ThemedText
                 style={[
                   styles.resendLink,
-                  timeLeft > 0 && styles.resendLinkDisabled,
+                  (timeLeft > 0 || isResending) && styles.resendLinkDisabled,
                 ]}
               >
-                {timeLeft > 0 ? `Resend in ${formatTime(timeLeft)}` : "Resend"}
+                {isResending
+                  ? "Sending..."
+                  : timeLeft > 0
+                  ? `Resend in ${formatTime(timeLeft)}`
+                  : "Resend"}
               </ThemedText>
             </TouchableOpacity>
           </View>

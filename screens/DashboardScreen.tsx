@@ -2,12 +2,13 @@ import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from "react";
+import CardsScreen from "./CardsScreen";
 import CoinWalletScreen from "./CoinWalletScreen";
 import HomeScreen from "./HomeScreen";
 import ProfileScreen from "./ProfileScreen";
 
 // Define valid icon names for TypeScript
-type IconName = "home" | "person" | "wallet";
+type IconName = "home" | "person" | "wallet" | "card";
 
 const Tab = createBottomTabNavigator();
 
@@ -25,6 +26,8 @@ const DashboardScreen = () => {
             iconName = "person";
           } else if (route.name === "CoinWallet") {
             iconName = "wallet";
+          } else if (route.name === "Cards") {
+            iconName = "card";
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
@@ -38,8 +41,9 @@ const DashboardScreen = () => {
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Cards" component={CardsScreen} />
       <Tab.Screen name="CoinWallet" component={CoinWalletScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
 };

@@ -2,10 +2,11 @@ import { ThemedText } from "@/components/ThemedText";
 import { OnboardingBackground } from "@/components/UniversalBackground";
 import { useUser } from "@/context/UserContext";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 // Import reusable components
-import React from "react";
+import React, { useState } from "react";
 import {
+  Alert,
   Dimensions,
   FlatList,
   ScrollView,
@@ -22,7 +23,10 @@ import { DiscountsContent } from "../components/DiscountsContent";
 import { EmptyState } from "../components/EmptyState";
 import { ReferenceCard } from "../components/ReferenceCard";
 import { SectionContainer } from "../components/SectionContainer";
+import { UserHeader } from "../components/UserHeader";
 import { VerificationBanner } from "../components/VerificationBanner";
+import { RootStackParamList } from "../types";
+import CardActionsModal from "../components/CardActionsModal";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -61,8 +65,11 @@ interface Transaction {
 
 const HomeScreen = () => {
   const insets = useSafeAreaInsets();
-  const { user, isProfileComplete } = useUser();
-  const navigation = useNavigation();
+  const { isProfileComplete } = useUser();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  // State for card actions modal
+  const [cardActionsModalVisible, setCardActionsModalVisible] = useState(false);
 
   // State for identity verification - check if profile is complete
   const profileComplete = isProfileComplete();
@@ -72,16 +79,82 @@ const HomeScreen = () => {
     // Check if profile is complete
     if (!isProfileComplete()) {
       // Navigate to SecurityVerificationScreen with the action name
-      navigation.navigate("SecurityVerification" as never, { actionName } as never);
+      navigation.navigate("SecurityVerification", { actionName });
     } else {
       // Handle the actual action (deposit, send, etc.)
-      console.log(`Performing action: ${actionName}`);
-      // TODO: Implement actual action handling
+      if (actionName === "more") {
+        // Show card actions modal when More button is pressed
+        setCardActionsModalVisible(true);
+      } else if (actionName === "deposit") {
+        // Navigate to Select Currency screen for deposit
+        navigation.navigate("SelectCurrency");
+      } else {
+        console.log(`Performing action: ${actionName}`);
+        // TODO: Implement actual action handling for send, etc.
+      }
     }
   };
 
-  // Get user name, fallback to "Guest" if not available
-  const userName = user?.fullName || "Guest";
+  // Function to handle card actions
+  const handleCardAction = (actionName: string) => {
+    console.log(`Performing ${actionName} action`);
+
+    // Check if profile is complete for certain actions
+    if (!isProfileComplete()) {
+      navigation.navigate("SecurityVerification", { actionName });
+      return;
+    }
+
+    // Handle specific actions
+    switch (actionName) {
+      case "convert":
+        // TODO: Navigate to conversion screen or show conversion modal
+        Alert.alert("Convert", "Convert between different currencies");
+        break;
+      case "withdraw":
+        // TODO: Navigate to withdrawal screen
+        Alert.alert("Withdraw", "Withdraw funds to your bank account");
+        break;
+      case "scan":
+        // TODO: Open QR scanner
+        Alert.alert("Scan QR Code", "Scan QR code to send or receive funds");
+        break;
+      case "gift":
+        // TODO: Navigate to gift screen
+        Alert.alert("Gift", "Send cryptocurrency as a gift to someone");
+        break;
+      default:
+        break;
+    }
+  };
+
+  // Define card actions
+  const cardActions = [
+    {
+      id: "convert",
+      title: "Convert",
+      iconSource: require("@/assets/Icons/Convert.png"),
+      onPress: () => handleCardAction("convert"),
+    },
+    {
+      id: "withdraw",
+      title: "Withdraw",
+      iconSource: require("@/assets/Icons/Withdraw.png"),
+      onPress: () => handleCardAction("withdraw"),
+    },
+    {
+      id: "scan",
+      title: "Scan QR Code",
+      iconSource: require("@/assets/Icons/Scan.png"),
+      onPress: () => handleCardAction("scan"),
+    },
+    {
+      id: "gift",
+      title: "Gift",
+      iconSource: require("@/assets/Icons/Gift.png"),
+      onPress: () => handleCardAction("gift"),
+    },
+  ];
 
   // Current balance and currency
   const currentBalance = "0.00"; // Will display properly without cutoff
@@ -160,17 +233,11 @@ const HomeScreen = () => {
       >
         {/* Header */}
         <View style={styles.header}>
-          <View style={styles.headerLeft}>
-            <View style={styles.avatarContainer}>
-              <ThemedText style={styles.avatarText}>
-                {userName.charAt(0).toUpperCase()}
-              </ThemedText>
-            </View>
-            <View>
-              <ThemedText style={styles.greetingText}>Welcome back!</ThemedText>
-              <ThemedText style={styles.userName}>{userName}</ThemedText>
-            </View>
-          </View>
+          <UserHeader
+            greetingText="Welcome back!"
+            useProfileImage={true}
+            avatarSize={65}
+          />
           <View style={styles.headerRight}>
             <TouchableOpacity style={styles.notificationButton}>
               <Ionicons
@@ -193,7 +260,7 @@ const HomeScreen = () => {
           <VerificationBanner
             onVerifyPress={() => {
               // Navigate to Personal Information screen to start verification
-              navigation.navigate("PersonalInformation" as never);
+              navigation.navigate("PersonalInformation");
             }}
           />
         )}
@@ -308,6 +375,13 @@ const HomeScreen = () => {
         {/* Bottom Spacing */}
         <View style={{ height: 100 }} />
       </ScrollView>
+
+      {/* Card Actions Modal */}
+      <CardActionsModal
+        visible={cardActionsModalVisible}
+        onClose={() => setCardActionsModalVisible(false)}
+        actions={cardActions}
+      />
     </OnboardingBackground>
   );
 };

@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
   Alert,
@@ -15,11 +15,15 @@ import {
 } from "react-native";
 import { OnboardingBackground } from "../components/UniversalBackground";
 import { useUser } from "../context/UserContext";
+import { RootStackParamList } from "../types";
+import CountrySelector from "../components/CountrySelector";
+import CountryInput from "../components/CountryInput";
 
 const AddressInformationScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { updateProfileStatus } = useUser();
   const [country, setCountry] = useState("Tunisia");
+  const [isCountryModalVisible, setCountryModalVisible] = useState(false);
   const [streetAddress, setStreetAddress] = useState("example");
   const [addressLine2, setAddressLine2] = useState(
     "apartment, suite, etc. (optional)"
@@ -41,7 +45,7 @@ const AddressInformationScreen = () => {
     updateProfileStatus("addressInformation", true);
 
     // Navigate to Identity Verification screen
-    navigation.navigate("IdentityVerification" as never);
+    navigation.navigate("IdentityVerification");
   };
 
   const handleBackPress = () => {
@@ -49,8 +53,11 @@ const AddressInformationScreen = () => {
   };
 
   const handleCountrySelect = () => {
-    // Handle country selection dropdown
-    Alert.alert("Country Selection", "Country selection feature coming soon");
+    setCountryModalVisible(true);
+  };
+
+  const handleCountrySelection = (selectedCountry: string) => {
+    setCountry(selectedCountry);
   };
 
   return (
@@ -87,25 +94,11 @@ const AddressInformationScreen = () => {
               {/* Form Section */}
               <View style={styles.formSection}>
                 {/* Country */}
-                <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>Country</Text>
-                  <TouchableOpacity
-                    style={styles.countryContainer}
-                    onPress={handleCountrySelect}
-                  >
-                    <View style={styles.countryContent}>
-                      <View style={styles.countryFlag}>
-                        <Text style={styles.flagEmoji}>🇹🇳</Text>
-                      </View>
-                      <Text style={styles.countryText}>{country}</Text>
-                    </View>
-                    <Ionicons
-                      name="chevron-down"
-                      size={20}
-                      color="rgba(255, 255, 255, 0.6)"
-                    />
-                  </TouchableOpacity>
-                </View>
+                <CountryInput
+                  label="Country"
+                  selectedCountry={country}
+                  onPress={handleCountrySelect}
+                />
 
                 {/* Street Address */}
                 <View style={styles.inputGroup}>
@@ -180,6 +173,15 @@ const AddressInformationScreen = () => {
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
+
+      {/* Country Selection Modal */}
+      <CountrySelector
+        visible={isCountryModalVisible}
+        onClose={() => setCountryModalVisible(false)}
+        onSelect={handleCountrySelection}
+        selectedCountry={country}
+        title="Select Country"
+      />
     </OnboardingBackground>
   );
 };
@@ -263,37 +265,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderBottomWidth: 1,
     borderBottomColor: "rgba(255, 255, 255, 0.3)",
-  },
-  countryContainer: {
-    backgroundColor: "transparent",
-    padding: 16,
-    paddingLeft: 0,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(255, 255, 255, 0.3)",
-  },
-  countryContent: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  countryFlag: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: "#EF4444",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 12,
-  },
-  flagEmoji: {
-    fontSize: 16,
-  },
-  countryText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "500",
   },
   cityPostalRow: {
     flexDirection: "row",

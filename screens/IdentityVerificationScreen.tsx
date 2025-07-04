@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
   Alert,
@@ -16,11 +16,15 @@ import {
 } from "react-native";
 import { OnboardingBackground } from "../components/UniversalBackground";
 import { useUser } from "../context/UserContext";
+import { RootStackParamList } from "../types";
+import CountrySelector from "../components/CountrySelector";
+import CountryInput from "../components/CountryInput";
 
 type DocumentType = "passport" | "driving" | "national";
+type CountrySelectType = "issuing" | "nationality";
 
 const IdentityVerificationScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { updateProfileStatus } = useUser();
   const [selectedDocument, setSelectedDocument] =
     useState<DocumentType>("passport");
@@ -28,8 +32,11 @@ const IdentityVerificationScreen = () => {
     "apartment, suite, etc. (optional)"
   );
   const [issuingCountry, setIssuingCountry] = useState("France");
-  const [nationality, setNationality] = useState("England");
+  const [nationality, setNationality] = useState("Tunisia");
   const [expiryDate, setExpiryDate] = useState("00/00/0000");
+  const [isCountryModalVisible, setCountryModalVisible] = useState(false);
+  const [countrySelectType, setCountrySelectType] =
+    useState<CountrySelectType>("issuing");
 
   const handleContinue = () => {
     // Basic validation
@@ -45,7 +52,7 @@ const IdentityVerificationScreen = () => {
     Alert.alert("Success", "Identity verification completed successfully!", [
       {
         text: "OK",
-        onPress: () => navigation.navigate("MainApp" as never),
+        onPress: () => navigation.navigate("MainApp"),
       },
     ]);
   };
@@ -58,8 +65,17 @@ const IdentityVerificationScreen = () => {
     setSelectedDocument(type);
   };
 
-  const handleCountrySelect = (type: "issuing" | "nationality") => {
-    Alert.alert("Country Selection", "Country selection feature coming soon");
+  const handleCountrySelect = (type: CountrySelectType) => {
+    setCountrySelectType(type);
+    setCountryModalVisible(true);
+  };
+
+  const handleCountrySelection = (selectedCountry: string) => {
+    if (countrySelectType === "issuing") {
+      setIssuingCountry(selectedCountry);
+    } else {
+      setNationality(selectedCountry);
+    }
   };
 
   const handleAddPhoto = (photoType: string) => {
@@ -181,45 +197,19 @@ const IdentityVerificationScreen = () => {
 
                 {/* Country and Nationality Row */}
                 <View style={styles.countryRow}>
-                  <View style={[styles.inputGroup, styles.countryInput]}>
-                    <Text style={styles.inputLabel}>Issuing Country</Text>
-                    <TouchableOpacity
-                      style={styles.countryContainer}
-                      onPress={() => handleCountrySelect("issuing")}
-                    >
-                      <View style={styles.countryContent}>
-                        <View style={styles.countryFlag}>
-                          <Text style={styles.flagEmoji}>🇫🇷</Text>
-                        </View>
-                        <Text style={styles.countryText}>{issuingCountry}</Text>
-                      </View>
-                      <Ionicons
-                        name="chevron-down"
-                        size={16}
-                        color="rgba(255, 255, 255, 0.6)"
-                      />
-                    </TouchableOpacity>
-                  </View>
+                  <CountryInput
+                    label="Issuing Country"
+                    selectedCountry={issuingCountry}
+                    onPress={() => handleCountrySelect("issuing")}
+                    style={styles.countryInput}
+                  />
 
-                  <View style={[styles.inputGroup, styles.countryInput]}>
-                    <Text style={styles.inputLabel}>Nationality</Text>
-                    <TouchableOpacity
-                      style={styles.countryContainer}
-                      onPress={() => handleCountrySelect("nationality")}
-                    >
-                      <View style={styles.countryContent}>
-                        <View style={styles.countryFlag}>
-                          <Text style={styles.flagEmoji}>🏴󠁧󠁢󠁥󠁮󠁧󠁿</Text>
-                        </View>
-                        <Text style={styles.countryText}>{nationality}</Text>
-                      </View>
-                      <Ionicons
-                        name="chevron-down"
-                        size={16}
-                        color="rgba(255, 255, 255, 0.6)"
-                      />
-                    </TouchableOpacity>
-                  </View>
+                  <CountryInput
+                    label="Nationality"
+                    selectedCountry={nationality}
+                    onPress={() => handleCountrySelect("nationality")}
+                    style={styles.countryInput}
+                  />
                 </View>
 
                 {/* Expiry Date */}
@@ -315,6 +305,19 @@ const IdentityVerificationScreen = () => {
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
+
+      {/* Country Selection Modal */}
+      <CountrySelector
+        visible={isCountryModalVisible}
+        onClose={() => setCountryModalVisible(false)}
+        onSelect={handleCountrySelection}
+        selectedCountry={
+          countrySelectType === "issuing" ? issuingCountry : nationality
+        }
+        title={`Select ${
+          countrySelectType === "issuing" ? "Issuing Country" : "Nationality"
+        }`}
+      />
     </OnboardingBackground>
   );
 };
@@ -456,38 +459,6 @@ const styles = StyleSheet.create({
   countryInput: {
     flex: 1,
     marginHorizontal: 4,
-  },
-  countryContainer: {
-    backgroundColor: "transparent",
-    padding: 16,
-    paddingLeft: 0,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(255, 255, 255, 0.3)",
-  },
-  countryContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-  },
-  countryFlag: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 12,
-  },
-  flagEmoji: {
-    fontSize: 16,
-  },
-  countryText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "500",
-    flex: 1,
   },
   dateInputContainer: {
     backgroundColor: "transparent",

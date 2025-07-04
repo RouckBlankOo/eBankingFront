@@ -28,7 +28,8 @@ const AppleIcon = require("../assets/Icons/AppleIcon.png");
 const GoogleIcon = require("../assets/Icons/GoogleIcon.png");
 
 const { width, height } = Dimensions.get("window");
-const API_URL = CONSTANTS.API_URL_PROD;
+// Use development URL for local testing, change to API_URL_PROD for production
+const API_URL = CONSTANTS.API_URL_DEV || CONSTANTS.API_URL_PROD;
 
 export default function LoginScreen() {
   const [inputType, setInputType] = useState<"email" | "phone">("email");
@@ -114,13 +115,13 @@ export default function LoginScreen() {
       await AsyncStorage.setItem("jwtToken", data.token);
       console.log("Login successful, token stored");
 
-      // Initialize user in context with default profile completion status
+      // Initialize user in context with backend data
       setUser({
-        fullName: data.user?.fullName || email.split('@')[0], // Use email prefix if no name provided
+        fullName: data.user?.fullName || email.split("@")[0],
         email: email,
-        phone: data.user?.phone || '',
+        phone: data.user?.phoneNumber || "",
         isAuthenticated: true,
-        profileCompletionStatus: {
+        profileCompletionStatus: data.user?.profileCompletionStatus || {
           personalInformation: false,
           addressInformation: false,
           identityVerification: false,
@@ -137,10 +138,12 @@ export default function LoginScreen() {
       });
       if (error.message.includes("Network request failed")) {
         setSnackbarMessage(
-          "Unable to connect to the server. Please check your network or try again later."
+          "Cannot connect to server. Please check your internet connection."
         );
+      } else if (error.message.includes("Invalid credentials")) {
+        setSnackbarMessage("Invalid email or password");
       } else {
-        setSnackbarMessage(error.message || "Something went wrong");
+        setSnackbarMessage(error.message || "Login failed. Please try again.");
       }
       setSnackbarVisible(true);
     } finally {

@@ -25,9 +25,16 @@ const ForgotPasswordScreen = () => {
       return;
     }
 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      Alert.alert("Error", "Please enter a valid email address");
+      return;
+    }
+
     try {
       const response = await fetch(
-        `${CONSTANTS.API_URL_PROD}/auth/forgot-password`,
+        `${
+          CONSTANTS.API_URL_DEV || CONSTANTS.API_URL_PROD
+        }/auth/forgot-password`,
         {
           method: "POST",
           headers: {
@@ -40,16 +47,19 @@ const ForgotPasswordScreen = () => {
       const data = await response.json();
       console.log("Forgot Password Response:", data);
 
-      if (data.success) {
+      if (response.ok && data.success) {
         Alert.alert("Success", data.message, [
           { text: "OK", onPress: () => navigation.navigate("Login") },
         ]);
       } else {
-        Alert.alert("Error", data.message);
+        Alert.alert("Error", data.message || "Failed to send reset request");
       }
     } catch (error) {
       console.error("Forgot Password Error:", error);
-      Alert.alert("Error", "Failed to send reset request. Please try again.");
+      Alert.alert(
+        "Error",
+        "Failed to send reset request. Please check your internet connection and try again."
+      );
     }
   };
 
