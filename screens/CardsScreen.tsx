@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   View,
-  Text,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -18,6 +17,7 @@ import { BlurView } from "expo-blur";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { OnboardingBackground } from "../components/UniversalBackground";
 import { UserHeader } from "../components/UserHeader";
+import Text from "../components/Text";
 
 const { width: screenWidth } = Dimensions.get("window");
 

@@ -29,4 +29,7 @@ export type RootStackParamList = {
   SelectCurrency: undefined;
   SelectMethod: { currency: { symbol: string; name: string; icon?: any } };
   Deposit: { currency: { symbol: string; name: string; icon?: any } };
+  BankTransfer: { currency: { symbol: string; name: string; icon?: any } };
+  BankTransferDetails: { amount: string; currency: string; usdcAmount: string };
+  BinancePay: { currency: { symbol: string; name: string; icon?: any } };
 };

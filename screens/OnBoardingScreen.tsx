@@ -4,12 +4,12 @@ import React from "react";
 import {
   SafeAreaView,
   StyleSheet,
-  Text,
   TextStyle,
   TouchableOpacity,
   View,
   ViewStyle,
 } from "react-native";
+import Text from "../components/Text";
 import { BorderRadius, Colors, Spacing, Typography } from "../constants/Theme";
 import { RootStackParamList } from "../types"; // Adjust the import path as necessary
 

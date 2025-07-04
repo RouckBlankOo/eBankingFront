@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   View,
-  Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
@@ -9,6 +8,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
+import Text from "../components/Text";
 import { CONSTANTS } from "../constants/index";
 
 const AuthTester = () => {

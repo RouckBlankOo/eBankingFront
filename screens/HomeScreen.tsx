@@ -11,13 +11,13 @@ import {
   FlatList,
   ScrollView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ActionButton } from "../components/ActionButton";
 import { AnalyticsChart } from "../components/AnalyticsChart";
+import Text from "../components/Text";
 import { CurrencyCard } from "../components/CurrencyCard";
 import { DiscountsContent } from "../components/DiscountsContent";
 import { EmptyState } from "../components/EmptyState";

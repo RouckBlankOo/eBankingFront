@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   View,
-  Text,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -12,6 +11,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { OnboardingBackground } from "../components/UniversalBackground";
+import Text from "../components/Text";
 import {
   NavigationProp,
   useNavigation,
@@ -19,6 +19,7 @@ import {
 } from "@react-navigation/native";
 import { RootStackParamList } from "../types";
 import QRCode from "react-native-qrcode-svg";
+import { BlurView } from "expo-blur";
 
 export default function DepositScreen() {
   const insets = useSafeAreaInsets();
@@ -173,35 +174,33 @@ export default function DepositScreen() {
                 animationType="slide"
                 onRequestClose={() => setShowNetworkDropdown(false)}
               >
-                <View style={styles.modalOverlay}>
-                  <OnboardingBackground style={styles.modalContainer}>
-                    <View
-                      style={[styles.modalContent, { paddingTop: insets.top }]}
+                <BlurView style={styles.blurOverlay} intensity={50} tint="dark">
+                  <TouchableOpacity
+                    style={styles.bottomSheetOverlay}
+                    activeOpacity={1}
+                    onPress={() => setShowNetworkDropdown(false)}
+                  >
+                    <TouchableOpacity
+                      style={styles.bottomSheetContainer}
+                      activeOpacity={1}
+                      onPress={() => {}}
                     >
-                      {/* Modal Header */}
-                      <View style={styles.modalHeader}>
-                        <TouchableOpacity
-                          style={styles.modalBackButton}
-                          onPress={() => setShowNetworkDropdown(false)}
-                        >
-                          <Ionicons
-                            name="chevron-back"
-                            size={24}
-                            color="#FFFFFF"
-                          />
-                        </TouchableOpacity>
-                        <Text style={styles.modalTitle}>Select Network</Text>
-                        <View style={styles.modalHeaderRight} />
+                      {/* Header */}
+                      <View style={styles.bottomSheetHeader}>
+                        <Text style={styles.bottomSheetTitle}>
+                          Select Network
+                        </Text>
                       </View>
 
                       {/* Warning Message */}
-                      <View style={styles.warningContainer}>
+                      <View style={styles.bottomSheetWarning}>
                         <Ionicons
                           name="information-circle-outline"
-                          size={20}
+                          size={16}
                           color="#F59E0B"
+                          style={styles.bottomSheetWarningIcon}
                         />
-                        <Text style={styles.warningText}>
+                        <Text style={styles.bottomSheetWarningText}>
                           Ensure the network you choose to deposit matches the
                           withdrawal network or assets may be lost.
                         </Text>
@@ -209,34 +208,32 @@ export default function DepositScreen() {
 
                       {/* Network List */}
                       <ScrollView
-                        style={styles.networkScrollContainer}
+                        style={styles.bottomSheetScrollContainer}
                         showsVerticalScrollIndicator={false}
-                        contentContainerStyle={styles.networkScrollContent}
+                        contentContainerStyle={styles.bottomSheetScrollContent}
                       >
                         {networks.map((network, index) => (
                           <TouchableOpacity
                             key={index}
-                            style={styles.networkItem}
+                            style={styles.bottomSheetNetworkItem}
                             onPress={() => handleNetworkSelect(network.name)}
                             activeOpacity={0.8}
                           >
-                            <View style={styles.networkItemContent}>
-                              <Text style={styles.networkItemName}>
-                                {network.name}
-                              </Text>
-                              <Text style={styles.networkItemDetail}>
-                                Minimum deposit amount: {network.minDeposit}
-                              </Text>
-                              <Text style={styles.networkItemDetail}>
-                                Deposit arrival: {network.confirmations}
-                              </Text>
-                            </View>
+                            <Text style={styles.bottomSheetNetworkTitle}>
+                              {network.name}
+                            </Text>
+                            <Text style={styles.bottomSheetNetworkSubtitle}>
+                              Minimum deposit amount: {network.minDeposit}
+                            </Text>
+                            <Text style={styles.bottomSheetNetworkSubtitle}>
+                              Deposit arrival: {network.confirmations}
+                            </Text>
                           </TouchableOpacity>
                         ))}
                       </ScrollView>
-                    </View>
-                  </OnboardingBackground>
-                </View>
+                    </TouchableOpacity>
+                  </TouchableOpacity>
+                </BlurView>
               </Modal>
             )}
           </View>
@@ -528,6 +525,9 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "90%",
   },
+  fullScreenModal: {
+    flex: 1,
+  },
   modalContent: {
     flex: 1,
     paddingHorizontal: 20,
@@ -537,7 +537,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingVertical: 16,
-    marginBottom: 20,
+    marginBottom: 24,
   },
   modalBackButton: {
     width: 40,
@@ -555,6 +555,26 @@ const styles = StyleSheet.create({
   },
   modalHeaderRight: {
     width: 40,
+  },
+  modalWarningContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    backgroundColor: "rgba(245, 158, 11, 0.1)",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: "rgba(245, 158, 11, 0.3)",
+  },
+  warningIcon: {
+    marginRight: 12,
+    marginTop: 2,
+  },
+  modalWarningText: {
+    flex: 1,
+    fontSize: 14,
+    color: "#F59E0B",
+    lineHeight: 20,
   },
   networkScrollContainer: {
     flex: 1,
@@ -581,6 +601,102 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   networkItemDetail: {
+    fontSize: 14,
+    color: "rgba(255, 255, 255, 0.7)",
+    marginBottom: 4,
+  },
+  networkCard: {
+    backgroundColor: "rgba(255, 255, 255, 0.08)",
+    borderRadius: 16,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.15)",
+  },
+  networkCardTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#FFFFFF",
+    marginBottom: 8,
+  },
+  networkCardSubtitle: {
+    fontSize: 14,
+    color: "rgba(255, 255, 255, 0.7)",
+    marginBottom: 4,
+  },
+  // Bottom Sheet Styles
+  blurOverlay: {
+    flex: 1,
+  },
+  bottomSheetOverlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "transparent",
+  },
+  bottomSheetContainer: {
+    backgroundColor: "rgba(20, 20, 20, 0.5)",
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    paddingTop: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+    maxHeight: "80%",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+  },
+  bottomSheetHeader: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  bottomSheetTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    textAlign: "center",
+  },
+  bottomSheetWarning: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    backgroundColor: "rgba(245, 158, 11, 0.1)",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "rgba(245, 158, 11, 0.3)",
+  },
+  bottomSheetWarningIcon: {
+    marginRight: 12,
+    marginTop: 2,
+  },
+  bottomSheetWarningText: {
+    flex: 1,
+    fontSize: 14,
+    color: "#F59E0B",
+    lineHeight: 20,
+  },
+  bottomSheetScrollContainer: {
+    maxHeight: 450,
+  },
+  bottomSheetScrollContent: {
+    paddingBottom: 20,
+  },
+  bottomSheetNetworkItem: {
+    backgroundColor: "rgba(255, 255, 255, 0.08)",
+    borderRadius: 16,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.15)",
+  },
+  bottomSheetNetworkTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#FFFFFF",
+    marginBottom: 8,
+  },
+  bottomSheetNetworkSubtitle: {
     fontSize: 14,
     color: "rgba(255, 255, 255, 0.7)",
     marginBottom: 4,

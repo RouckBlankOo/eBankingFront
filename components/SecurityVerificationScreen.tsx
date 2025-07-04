@@ -6,13 +6,8 @@ import {
   useRoute,
 } from "@react-navigation/native";
 import React from "react";
-import {
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { SafeAreaView, StyleSheet, TouchableOpacity, View } from "react-native";
+import Text from "./Text";
 import { RootStackParamList } from "../types";
 import { OnboardingBackground } from "./UniversalBackground";
 

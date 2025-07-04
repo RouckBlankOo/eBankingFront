@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import {
   View,
-  Text,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import Text from "../components/Text";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { OnboardingBackground } from "../components/UniversalBackground";
 import { NavigationProp, useNavigation } from "@react-navigation/native";

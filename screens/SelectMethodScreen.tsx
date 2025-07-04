@@ -1,13 +1,13 @@
 import React from "react";
 import {
   View,
-  Text,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   Image,
   Alert,
 } from "react-native";
+import Text from "../components/Text";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { OnboardingBackground } from "../components/UniversalBackground";
@@ -46,7 +46,7 @@ export default function SelectMethodScreen() {
       title: "Deposit cryptos from another platform",
       description: "",
       buttonText: "On-chain Deposit",
-      buttonIcon: "link-outline",
+      buttonIcon: "On-chain.png",
       buttonColor: "#3B82F6",
     },
     {
@@ -54,7 +54,7 @@ export default function SelectMethodScreen() {
       title: "Funds deposited via Binance Pay are solely for wallet top-ups.",
       description: `0.01 ${currency} ~ 50000 ${currency}`,
       buttonText: "Binance Pay",
-      buttonIcon: "wallet-outline",
+      buttonIcon: "BinanceApp.png",
       buttonColor: "#F59E0B",
     },
     {
@@ -62,7 +62,7 @@ export default function SelectMethodScreen() {
       title: "Funds deposited via Bank are solely for wallet top-ups.",
       description: `30.30 ${currency} ~ 910 ${currency}`,
       buttonText: "Bank transfer",
-      buttonIcon: "card-outline",
+      buttonIcon: "Bank.png",
       buttonColor: "#3B82F6",
     },
   ];
@@ -77,8 +77,18 @@ export default function SelectMethodScreen() {
       navigation.navigate("Deposit", {
         currency: selectedCurrency,
       });
+    } else if (method.buttonText === "Bank transfer") {
+      // Navigate to Bank Transfer screen
+      navigation.navigate("BankTransfer", {
+        currency: selectedCurrency,
+      });
+    } else if (method.buttonText === "Binance Pay") {
+      // Navigate to Binance Pay screen
+      navigation.navigate("BinancePay", {
+        currency: selectedCurrency,
+      });
     } else {
-      // TODO: Navigate to other deposit flows (Binance Pay, Bank transfer)
+      // TODO: Navigate to other deposit flows
       Alert.alert(
         "Coming Soon",
         `${method.buttonText} functionality will be available soon!`
@@ -102,10 +112,14 @@ export default function SelectMethodScreen() {
           onPress={() => handleMethodSelect(method)}
           activeOpacity={0.8}
         >
-          <Ionicons
-            name={method.buttonIcon as any}
-            size={20}
-            color="#FFFFFF"
+          <Image
+            source={
+              method.buttonIcon === "On-chain.png"
+                ? require("../assets/Icons/On-chain.png")
+                : method.buttonIcon === "BinanceApp.png"
+                ? require("../assets/Icons/BinanceApp.png")
+                : require("../assets/Icons/Bank.png")
+            }
             style={styles.buttonIcon}
           />
           <Text style={styles.methodButtonText}>{method.buttonText}</Text>
@@ -139,7 +153,11 @@ export default function SelectMethodScreen() {
                 resizeMode="contain"
               />
             ) : (
-              <Ionicons name="logo-usd" size={24} color="#3B82F6" />
+              <Image
+                source={require("../assets/Icons/USDC.png")}
+                style={styles.currencyIcon}
+                resizeMode="contain"
+              />
             )}
           </View>
           <Text style={styles.currencySymbol}>{selectedCurrency.symbol}</Text>
@@ -251,7 +269,10 @@ const styles = StyleSheet.create({
     minHeight: 48,
   },
   buttonIcon: {
+    width: 20,
+    height: 20,
     marginRight: 8,
+    tintColor: "#FFFFFF",
   },
   methodButtonText: {
     fontSize: 16,

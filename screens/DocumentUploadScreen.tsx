@@ -8,11 +8,11 @@ import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import Text from "../components/Text";
 import { OnboardingBackground } from "../components/UniversalBackground";
 
 type DocumentType = "passport" | "driving" | "national";

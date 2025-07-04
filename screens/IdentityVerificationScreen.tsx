@@ -9,11 +9,11 @@ import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import Text from "../components/Text";
 import { OnboardingBackground } from "../components/UniversalBackground";
 import { useUser } from "../context/UserContext";
 import { RootStackParamList } from "../types";

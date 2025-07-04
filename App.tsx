@@ -7,6 +7,9 @@ import { UserProvider } from "./context/UserContext";
 import AppNavigator from "./navigator/AppNavigator";
 import AddressInformationScreen from "./screens/AddressInformationScreen";
 import AuthTester from "./screens/AuthTester";
+import BankTransferScreen from "./screens/BankTransferScreen";
+import BankTransferDetailsScreen from "./screens/BankTransferDetailsScreen";
+import BinancePayScreen from "./screens/BinancePayScreen";
 import CodeConfirmationScreen from "./screens/CodeConfirmationScreen";
 import DepositScreen from "./screens/DepositScreen";
 import DocumentUploadScreen from "./screens/DocumentUploadScreen";
@@ -115,6 +118,21 @@ export default function App() {
             <Stack.Screen
               name="Deposit"
               component={DepositScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="BankTransfer"
+              component={BankTransferScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="BankTransferDetails"
+              component={BankTransferDetailsScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="BinancePay"
+              component={BinancePayScreen}
               options={{ headerShown: false }}
             />
           </Stack.Navigator>

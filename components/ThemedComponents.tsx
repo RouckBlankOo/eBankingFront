@@ -5,7 +5,6 @@
 import { useTheme } from "@/hooks/useTheme";
 import React from "react";
 import {
-  Text,
   TextInput,
   TextInputProps,
   TextProps,
@@ -16,6 +15,7 @@ import {
   ViewProps,
   ViewStyle,
 } from "react-native";
+import Text from "./Text";
 
 // Themed View Component
 interface ThemedViewProps extends ViewProps {

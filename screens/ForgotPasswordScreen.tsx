@@ -3,11 +3,11 @@ import React, { useState } from "react";
 import {
   Alert,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import Text from "../components/Text";
 import { CONSTANTS } from "../constants"; // Import your constants file
 
 type RootStackParamList = {

@@ -2,12 +2,12 @@ import React from "react";
 import {
   Modal,
   View,
-  Text,
   TouchableOpacity,
   StyleSheet,
   Image,
   ImageSourcePropType,
 } from "react-native";
+import Text from "./Text";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 
