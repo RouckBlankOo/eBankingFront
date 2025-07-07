@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import {
   View,
   ScrollView,
@@ -11,27 +11,26 @@ import {
   TextInput,
   Alert,
 } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { BlurView } from "expo-blur";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { OnboardingBackground } from "../components/UniversalBackground";
 import { UserHeader } from "../components/UserHeader";
 import Text from "../components/Text";
+import MoreOptionsModal, { MoreOption } from "../components/MoreOptionsModal";
+import { RootStackParamList } from "../types";
+import { useUser, Card } from "../context/UserContext";
 
 const { width: screenWidth } = Dimensions.get("window");
 
-interface Card {
+interface GetCardOption {
   id: string;
-  type: string;
-  name?: string;
-  balance: string;
-  cardNumber: string;
-  gradient: string[];
-  isFrozen?: boolean;
-  isInfoHidden?: boolean;
-  limit?: number;
+  type: "get-card";
 }
+
+type CardOrGetCard = Card | GetCardOption;
 
 interface Transaction {
   id: string;
@@ -44,41 +43,13 @@ interface Transaction {
 
 export default function CardsScreen() {
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { cards, updateCard, deleteCard } = useUser();
 
   // State for managing cards and UI
-  const [selectedCardId, setSelectedCardId] = useState<string>("1"); // Default to first card
-  const [cards, setCards] = useState<Card[]>([
-    {
-      id: "1",
-      type: "Card",
-      balance: "0.00",
-      cardNumber: "•••• •••• •••• 0000",
-      gradient: ["#667eea", "#764ba2"],
-      isFrozen: false,
-      isInfoHidden: false,
-      limit: 1000,
-    },
-    {
-      id: "2",
-      type: "Card",
-      balance: "0.00",
-      cardNumber: "•••• •••• •••• 0000",
-      gradient: ["#f093fb", "#f5576c"],
-      isFrozen: false,
-      isInfoHidden: false,
-      limit: 2000,
-    },
-    {
-      id: "3",
-      type: "Card",
-      balance: "0.00",
-      cardNumber: "•••• •••• •••• 0000",
-      gradient: ["#4facfe", "#00f2fe"],
-      isFrozen: false,
-      isInfoHidden: false,
-      limit: 1500,
-    },
-  ]);
+  const [selectedCardId, setSelectedCardId] = useState<string>(
+    cards.length > 0 ? cards[0].id : "1"
+  ); // Default to first card
 
   // State for limit modal
   const [limitModalVisible, setLimitModalVisible] = useState(false);
@@ -92,29 +63,26 @@ export default function CardsScreen() {
   // Get selected card
   const selectedCard = cards.find((card) => card.id === selectedCardId);
 
+  // Combine cards with get card option
+  const cardsWithGetCardOption: CardOrGetCard[] = [
+    ...cards,
+    { id: "get-card", type: "get-card" } as GetCardOption,
+  ];
+
   // Card action functions
-  const handleFreezeCard = () => {
-    setCards((prevCards) =>
-      prevCards.map((card) =>
-        card.id === selectedCardId
-          ? { ...card, isFrozen: !card.isFrozen }
-          : card
-      )
-    );
+  const handleFreezeCard = useCallback(() => {
+    if (selectedCard) {
+      updateCard(selectedCardId, { isFrozen: !selectedCard.isFrozen });
+      const action = selectedCard.isFrozen ? "unfrozen" : "frozen";
+      Alert.alert("Card Status", `Card has been ${action}`);
+    }
+  }, [selectedCard, selectedCardId, updateCard]);
 
-    const action = selectedCard?.isFrozen ? "unfrozen" : "frozen";
-    Alert.alert("Card Status", `Card has been ${action}`);
-  };
-
-  const handleToggleSensitiveInfo = () => {
-    setCards((prevCards) =>
-      prevCards.map((card) =>
-        card.id === selectedCardId
-          ? { ...card, isInfoHidden: !card.isInfoHidden }
-          : card
-      )
-    );
-  };
+  const handleToggleSensitiveInfo = useCallback(() => {
+    if (selectedCard) {
+      updateCard(selectedCardId, { isInfoHidden: !selectedCard.isInfoHidden });
+    }
+  }, [selectedCard, selectedCardId, updateCard]);
 
   const handleOpenLimitModal = () => {
     setNewLimit(selectedCard?.limit?.toString() || "");
@@ -128,11 +96,7 @@ export default function CardsScreen() {
       return;
     }
 
-    setCards((prevCards) =>
-      prevCards.map((card) =>
-        card.id === selectedCardId ? { ...card, limit: limitValue } : card
-      )
-    );
+    updateCard(selectedCardId, { limit: limitValue });
 
     setLimitModalVisible(false);
     Alert.alert("Limit Updated", `Card limit set to $${limitValue.toFixed(2)}`);
@@ -145,7 +109,6 @@ export default function CardsScreen() {
 
   const handleChangeName = () => {
     setNewCardName(selectedCard?.name || selectedCard?.type || "");
-    setMoreModalVisible(false);
     setChangeNameModalVisible(true);
   };
 
@@ -155,25 +118,17 @@ export default function CardsScreen() {
       return;
     }
 
-    setCards((prevCards) =>
-      prevCards.map((card) =>
-        card.id === selectedCardId
-          ? { ...card, name: newCardName.trim() }
-          : card
-      )
-    );
+    updateCard(selectedCardId, { name: newCardName.trim() });
 
     setChangeNameModalVisible(false);
     Alert.alert("Name Updated", `Card name changed to "${newCardName.trim()}"`);
   };
 
   const handleEditCardDesign = () => {
-    setMoreModalVisible(false);
     Alert.alert("Edit Design", "Card design editor coming soon!");
   };
 
   const handleDeleteCard = () => {
-    setMoreModalVisible(false);
     Alert.alert(
       "Delete Card",
       "Are you sure you want to delete this card? This action cannot be undone.",
@@ -183,14 +138,14 @@ export default function CardsScreen() {
           text: "Delete",
           style: "destructive",
           onPress: () => {
-            const updatedCards = cards.filter(
-              (card) => card.id !== selectedCardId
-            );
-            setCards(updatedCards);
+            deleteCard(selectedCardId);
 
             // Select the first remaining card or reset if no cards left
-            if (updatedCards.length > 0) {
-              setSelectedCardId(updatedCards[0].id);
+            const remainingCards = cards.filter(
+              (card) => card.id !== selectedCardId
+            );
+            if (remainingCards.length > 0) {
+              setSelectedCardId(remainingCards[0].id);
             } else {
               setSelectedCardId("");
             }
@@ -201,6 +156,35 @@ export default function CardsScreen() {
       ]
     );
   };
+
+  // Card more options configuration
+  const cardMoreOptions: MoreOption[] = [
+    {
+      id: "change-name",
+      title: "Change Name",
+      description: "Customize your card display name",
+      icon: "create-outline",
+      gradient: ["rgba(29, 36, 45, 1)", "rgba(29, 36, 45, 0.5)"],
+      onPress: handleChangeName,
+    },
+    {
+      id: "edit-design",
+      title: "Edit Card Design",
+      description: "Personalize your card appearance",
+      icon: "color-palette-outline",
+      gradient: ["rgba(29, 36, 45, 1)", "rgba(29, 36, 45, 0.5)"],
+      onPress: handleEditCardDesign,
+    },
+    {
+      id: "delete-card",
+      title: "Delete Card",
+      description: "Permanently remove this card",
+      icon: "trash-outline",
+      gradient: ["rgba(29, 36, 45, 1)", "rgba(29, 36, 45, 0.5)"],
+      onPress: handleDeleteCard,
+      isDanger: true,
+    },
+  ];
 
   // Empty transactions array
   const transactions: Transaction[] = [];
@@ -240,6 +224,26 @@ export default function CardsScreen() {
     </TouchableOpacity>
   );
 
+  const renderGetCard = () => (
+    <TouchableOpacity
+      style={styles.getCardContainer}
+      onPress={() => navigation.navigate("CardTypes")}
+    >
+      <View style={styles.getCardContent}>
+        <View style={styles.getCardButton}>
+          <Text style={styles.getCardText}>+ Get Card</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
+  const renderCardOrGetCard = ({ item }: { item: CardOrGetCard }) => {
+    if (item.type === "get-card") {
+      return renderGetCard();
+    }
+    return renderCard({ item: item as Card, index: 0 });
+  };
+
   const renderTransaction = ({ item }: { item: Transaction }) => (
     <View style={styles.transactionItem}>
       <View style={styles.transactionLeft}>
@@ -262,8 +266,12 @@ export default function CardsScreen() {
 
   return (
     <OnboardingBackground style={styles.container}>
+      <StatusBar style="light" translucent backgroundColor="transparent" />
+      {/* Status bar background overlay */}
+      <View style={[styles.statusBarBackground, { height: insets.top }]} />
       <ScrollView
-        style={[styles.scrollContainer, { paddingTop: insets.top }]}
+        style={styles.scrollContainer}
+        contentContainerStyle={{ paddingTop: insets.top + 1 }}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
@@ -277,15 +285,14 @@ export default function CardsScreen() {
             <Ionicons name="notifications-outline" size={24} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
-
         {/* My Cards Section */}
         <View style={styles.cardsSection}>
           <View style={styles.cardsSectionHeader}>
             <Text style={styles.sectionTitle}>My Cards</Text>
           </View>
           <FlatList
-            data={cards}
-            renderItem={renderCard}
+            data={cardsWithGetCardOption}
+            renderItem={renderCardOrGetCard}
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -333,7 +340,7 @@ export default function CardsScreen() {
               />
             </LinearGradient>
             <Text style={styles.actionButtonText}>
-              {selectedCard?.isInfoHidden ? "Show Info" : "Hide Info"}
+              {selectedCard?.isInfoHidden ? "Show Details" : "Hide Details"}
             </Text>
           </TouchableOpacity>
 
@@ -448,107 +455,15 @@ export default function CardsScreen() {
       </Modal>
 
       {/* More Actions Modal */}
-      <Modal
+      <MoreOptionsModal
         visible={moreModalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setMoreModalVisible(false)}
-      >
-        <View style={styles.moreModalContainer}>
-          <BlurView intensity={20} style={styles.moreModalBlurView}>
-            <TouchableOpacity
-              style={styles.moreBackdrop}
-              activeOpacity={1}
-              onPress={() => setMoreModalVisible(false)}
-            />
-
-            <View style={styles.moreModalContent}>
-              {/* Header */}
-              <View style={styles.moreModalHeader}>
-                <View style={styles.moreHeaderLeft}></View>
-                <TouchableOpacity
-                  style={styles.moreCloseButton}
-                  onPress={() => setMoreModalVisible(false)}
-                >
-                  <Ionicons name="close" size={24} color="#FFFFFF" />
-                </TouchableOpacity>
-              </View>
-
-              {/* Actions List */}
-              <View style={styles.moreActionsContainer}>
-                <TouchableOpacity
-                  style={styles.moreActionItem}
-                  onPress={() => {
-                    handleChangeName();
-                  }}
-                >
-                  <View style={styles.moreActionLeft}>
-                    <View style={styles.moreActionIconContainer}>
-                      <Ionicons
-                        name="create-outline"
-                        size={24}
-                        color="#FFFFFF"
-                      />
-                    </View>
-                    <Text style={styles.moreActionTitle}>Change Name</Text>
-                  </View>
-                  <Ionicons
-                    name="chevron-forward"
-                    size={20}
-                    color="rgba(255, 255, 255, 0.6)"
-                  />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.moreActionItem}
-                  onPress={() => {
-                    handleEditCardDesign();
-                  }}
-                >
-                  <View style={styles.moreActionLeft}>
-                    <View style={styles.moreActionIconContainer}>
-                      <Ionicons
-                        name="color-palette-outline"
-                        size={24}
-                        color="#FFFFFF"
-                      />
-                    </View>
-                    <Text style={styles.moreActionTitle}>Edit Card design</Text>
-                  </View>
-                  <Ionicons
-                    name="chevron-forward"
-                    size={20}
-                    color="rgba(255, 255, 255, 0.6)"
-                  />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[styles.moreActionItem, styles.moreLastActionItem]}
-                  onPress={() => {
-                    handleDeleteCard();
-                  }}
-                >
-                  <View style={styles.moreActionLeft}>
-                    <View style={styles.moreActionIconContainer}>
-                      <Ionicons
-                        name="trash-outline"
-                        size={24}
-                        color="#FFFFFF"
-                      />
-                    </View>
-                    <Text style={styles.moreActionTitle}>Delete Card</Text>
-                  </View>
-                  <Ionicons
-                    name="chevron-forward"
-                    size={20}
-                    color="rgba(255, 255, 255, 0.6)"
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-          </BlurView>
-        </View>
-      </Modal>
+        onClose={() => setMoreModalVisible(false)}
+        options={cardMoreOptions}
+        title="Card Options"
+        subtitle="Manage your card settings"
+        headerIcon="card"
+        headerIconColor="#3B82F6"
+      />
 
       {/* Change Name Modal */}
       <Modal
@@ -594,6 +509,14 @@ export default function CardsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  statusBarBackground: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "black",
+    zIndex: 1000,
   },
   scrollContainer: {
     flex: 1,
@@ -697,6 +620,34 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "rgba(255, 255, 255, 0.9)",
     letterSpacing: 2,
+  },
+  // Get Card Styles
+  getCardContainer: {
+    width: screenWidth - 80,
+    height: 200,
+    borderRadius: 16,
+    backgroundColor: "transparent",
+    borderWidth: 2,
+    borderColor: "#3B82F6",
+    borderStyle: "dashed",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  getCardContent: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  getCardButton: {
+    backgroundColor: "#3B82F6",
+    paddingHorizontal: 50,
+    paddingVertical: 10,
+    borderRadius: 40,
+  },
+  getCardText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#FFFFFF",
+    textAlign: "center",
   },
   actionButtonsContainer: {
     flexDirection: "row",

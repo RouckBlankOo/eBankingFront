@@ -19,6 +19,9 @@ export default function AppNavigator() {
     <Tab.Navigator
       initialRouteName="Home"
       screenOptions={({ route }) => ({
+        lazy: true, // Enable lazy loading for better performance
+        tabBarHideOnKeyboard: true, // Hide tab bar when keyboard is open
+        tabBarAllowFontScaling: false, // Prevent font scaling issues
         tabBarIcon: ({ focused }) => {
           // Home tab with special circular design
           if (route.name === "Home") {

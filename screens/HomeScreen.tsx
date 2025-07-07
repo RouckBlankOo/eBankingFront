@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ActionButton } from "../components/ActionButton";
 import { AnalyticsChart } from "../components/AnalyticsChart";
@@ -26,7 +27,7 @@ import { SectionContainer } from "../components/SectionContainer";
 import { UserHeader } from "../components/UserHeader";
 import { VerificationBanner } from "../components/VerificationBanner";
 import { RootStackParamList } from "../types";
-import CardActionsModal from "../components/CardActionsModal";
+import MoreOptionsModal, { MoreOption } from "../components/MoreOptionsModal";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -68,11 +69,16 @@ const HomeScreen = () => {
   const { isProfileComplete } = useUser();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  // State for card actions modal
-  const [cardActionsModalVisible, setCardActionsModalVisible] = useState(false);
+  // State for more options modal
+  const [moreOptionsModalVisible, setMoreOptionsModalVisible] = useState(false);
 
   // State for identity verification - check if profile is complete
   const profileComplete = isProfileComplete();
+
+  // Function to handle profile press
+  const handleProfilePress = () => {
+    navigation.navigate("ProfileScreen");
+  };
 
   // Function to handle action button presses
   const handleActionPress = (actionName: string) => {
@@ -83,8 +89,8 @@ const HomeScreen = () => {
     } else {
       // Handle the actual action (deposit, send, etc.)
       if (actionName === "more") {
-        // Show card actions modal when More button is pressed
-        setCardActionsModalVisible(true);
+        // Show more options modal when More button is pressed
+        setMoreOptionsModalVisible(true);
       } else if (actionName === "deposit") {
         // Navigate to Select Currency screen for deposit
         navigation.navigate("SelectCurrency");
@@ -112,8 +118,8 @@ const HomeScreen = () => {
         Alert.alert("Convert", "Convert between different currencies");
         break;
       case "withdraw":
-        // TODO: Navigate to withdrawal screen
-        Alert.alert("Withdraw", "Withdraw funds to your bank account");
+        // Navigate to withdrawal screen
+        navigation.navigate("Withdraw");
         break;
       case "scan":
         // TODO: Open QR scanner
@@ -128,30 +134,42 @@ const HomeScreen = () => {
     }
   };
 
-  // Define card actions
-  const cardActions = [
+  // Define card actions for more options modal
+  const homeMoreOptions: MoreOption[] = [
     {
       id: "convert",
       title: "Convert",
+      description: "Exchange between currencies",
+      icon: "swap-horizontal-outline",
       iconSource: require("@/assets/Icons/Convert.png"),
+      gradient: ["rgba(29, 36, 45, 1)", "rgba(29, 36, 45, 0.5)"],
       onPress: () => handleCardAction("convert"),
     },
     {
       id: "withdraw",
       title: "Withdraw",
+      description: "Transfer funds to your bank",
+      icon: "arrow-up-outline",
       iconSource: require("@/assets/Icons/Withdraw.png"),
+      gradient: ["rgba(29, 36, 45, 1)", "rgba(29, 36, 45, 0.5)"],
       onPress: () => handleCardAction("withdraw"),
     },
     {
       id: "scan",
       title: "Scan QR Code",
+      description: "Quick payments and transfers",
+      icon: "qr-code-outline",
       iconSource: require("@/assets/Icons/Scan.png"),
+      gradient: ["rgba(29, 36, 45, 1)", "rgba(29, 36, 45, 0.5)"],
       onPress: () => handleCardAction("scan"),
     },
     {
       id: "gift",
       title: "Gift",
+      description: "Send money to friends and family",
+      icon: "gift-outline",
       iconSource: require("@/assets/Icons/Gift.png"),
+      gradient: ["rgba(29, 36, 45, 1)", "rgba(29, 36, 45, 0.5)"],
       onPress: () => handleCardAction("gift"),
     },
   ];
@@ -227,8 +245,12 @@ const HomeScreen = () => {
 
   return (
     <OnboardingBackground style={styles.container}>
+      <StatusBar style="light" translucent backgroundColor="#002657" />
+      {/* Status bar background overlay */}
+      <View style={[styles.statusBarBackground, { height: insets.top }]} />
       <ScrollView
-        style={[styles.scrollContainer, { paddingTop: insets.top }]}
+        style={styles.scrollContainer}
+        contentContainerStyle={{ paddingTop: insets.top - 10 }}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
@@ -237,6 +259,7 @@ const HomeScreen = () => {
             greetingText="Welcome back!"
             useProfileImage={true}
             avatarSize={65}
+            onProfilePress={handleProfilePress}
           />
           <View style={styles.headerRight}>
             <TouchableOpacity style={styles.notificationButton}>
@@ -249,12 +272,8 @@ const HomeScreen = () => {
                 <ThemedText style={styles.notificationCount}>0</ThemedText>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.profileButton}>
-              <Ionicons name="person-outline" size={24} color="#FFFFFF" />
-            </TouchableOpacity>
           </View>
         </View>
-
         {/* Verification Banner */}
         {!profileComplete && (
           <VerificationBanner
@@ -376,11 +395,15 @@ const HomeScreen = () => {
         <View style={{ height: 100 }} />
       </ScrollView>
 
-      {/* Card Actions Modal */}
-      <CardActionsModal
-        visible={cardActionsModalVisible}
-        onClose={() => setCardActionsModalVisible(false)}
-        actions={cardActions}
+      {/* More Options Modal */}
+      <MoreOptionsModal
+        visible={moreOptionsModalVisible}
+        onClose={() => setMoreOptionsModalVisible(false)}
+        options={homeMoreOptions}
+        title="Quick Actions"
+        subtitle="Choose an action to perform"
+        headerIcon="ellipsis-horizontal"
+        headerIconColor="#3B82F6"
       />
     </OnboardingBackground>
   );
@@ -389,6 +412,14 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  statusBarBackground: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "black",
+    zIndex: 1000,
   },
   scrollContainer: {
     flex: 1,
@@ -630,7 +661,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.05)",
-    backdropFilter: "blur(10px)",
     flex: 1,
   },
   sectionTitle: {
@@ -772,7 +802,6 @@ const styles = StyleSheet.create({
     padding: 20,
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.05)",
-    backdropFilter: "blur(10px)",
     minHeight: 100,
   },
   emptyAdditionalState: {

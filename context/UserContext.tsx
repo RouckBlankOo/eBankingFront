@@ -1,5 +1,19 @@
 import React, { createContext, ReactNode, useContext, useState } from "react";
 
+export interface Card {
+  id: string;
+  type: string;
+  name?: string;
+  balance: string;
+  cardNumber: string;
+  gradient: string[];
+  isFrozen?: boolean;
+  isInfoHidden?: boolean;
+  limit?: number;
+  cardType?: "virtual" | "premium";
+  pattern?: number;
+}
+
 interface User {
   fullName: string;
   email: string;
@@ -14,6 +28,7 @@ interface User {
 
 interface UserContextType {
   user: User | null;
+  cards: Card[];
   setUser: (user: User | null) => void;
   updateUser: (updates: Partial<User>) => void;
   updateProfileStatus: (
@@ -21,6 +36,9 @@ interface UserContextType {
     completed: boolean
   ) => void;
   isProfileComplete: () => boolean;
+  addCard: (card: Omit<Card, "id">) => void;
+  updateCard: (cardId: string, updates: Partial<Card>) => void;
+  deleteCard: (cardId: string) => void;
   logout: () => void;
 }
 
@@ -40,6 +58,38 @@ interface UserProviderProps {
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [user, setUserState] = useState<User | null>(null);
+  const [cards, setCards] = useState<Card[]>([
+    {
+      id: "1",
+      type: "Card",
+      balance: "0.00",
+      cardNumber: "•••• •••• •••• 0000",
+      gradient: ["#667eea", "#764ba2"],
+      isFrozen: false,
+      isInfoHidden: false,
+      limit: 1000,
+    },
+    {
+      id: "2",
+      type: "Card",
+      balance: "0.00",
+      cardNumber: "•••• •••• •••• 0000",
+      gradient: ["#f093fb", "#f5576c"],
+      isFrozen: false,
+      isInfoHidden: false,
+      limit: 2000,
+    },
+    {
+      id: "3",
+      type: "Card",
+      balance: "0.00",
+      cardNumber: "•••• •••• •••• 0000",
+      gradient: ["#4facfe", "#00f2fe"],
+      isFrozen: false,
+      isInfoHidden: false,
+      limit: 1500,
+    },
+  ]);
 
   const setUser = (userData: User | null) => {
     setUserState(userData);
@@ -73,6 +123,26 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     return personalInformation && addressInformation && identityVerification;
   };
 
+  const addCard = (cardData: Omit<Card, "id">) => {
+    const newCard: Card = {
+      ...cardData,
+      id: Date.now().toString(),
+    };
+    setCards((prevCards) => [...prevCards, newCard]);
+  };
+
+  const updateCard = (cardId: string, updates: Partial<Card>) => {
+    setCards((prevCards) =>
+      prevCards.map((card) =>
+        card.id === cardId ? { ...card, ...updates } : card
+      )
+    );
+  };
+
+  const deleteCard = (cardId: string) => {
+    setCards((prevCards) => prevCards.filter((card) => card.id !== cardId));
+  };
+
   const logout = () => {
     setUserState(null);
   };
@@ -81,10 +151,14 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     <UserContext.Provider
       value={{
         user,
+        cards,
         setUser,
         updateUser,
         updateProfileStatus,
         isProfileComplete,
+        addCard,
+        updateCard,
+        deleteCard,
         logout,
       }}
     >

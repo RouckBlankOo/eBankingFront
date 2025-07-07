@@ -32,4 +32,9 @@ export type RootStackParamList = {
   BankTransfer: { currency: { symbol: string; name: string; icon?: any } };
   BankTransferDetails: { amount: string; currency: string; usdcAmount: string };
   BinancePay: { currency: { symbol: string; name: string; icon?: any } };
+  Withdraw: undefined;
+  CardTypes: undefined;
+  ChooseCard: { cardType: "virtual" | "premium" };
+  CardCustomization: { cardType: "virtual" | "premium" };
+  ProfileScreen: undefined;
 };

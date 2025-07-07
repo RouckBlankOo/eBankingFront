@@ -49,7 +49,6 @@ const styles = StyleSheet.create({
     padding: 20,
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.05)",
-    backdropFilter: "blur(10px)",
     minHeight: 100,
   },
   containerWithoutTitle: {
@@ -59,7 +58,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.05)",
-    backdropFilter: "blur(10px)",
     minHeight: 100,
   },
   title: {

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useUser } from "../context/UserContext";
 
 interface UserHeaderProps {
@@ -7,6 +7,7 @@ interface UserHeaderProps {
   useProfileImage?: boolean;
   avatarSize?: number;
   style?: any;
+  onProfilePress?: () => void;
 }
 
 export const UserHeader: React.FC<UserHeaderProps> = ({
@@ -14,40 +15,49 @@ export const UserHeader: React.FC<UserHeaderProps> = ({
   useProfileImage = false,
   avatarSize = 40,
   style,
+  onProfilePress,
 }) => {
   const { user } = useUser();
   const userName = user?.fullName || "Guest";
 
+  const avatarContent = useProfileImage ? (
+    <Image
+      source={require("../assets/Icons/DefaultProfile.png")}
+      style={[
+        styles.avatarImage,
+        {
+          width: avatarSize,
+          height: avatarSize,
+          borderRadius: avatarSize / 3,
+        },
+      ]}
+      resizeMode="cover"
+    />
+  ) : (
+    <View
+      style={[
+        styles.avatarContainer,
+        {
+          width: avatarSize,
+          height: avatarSize,
+          borderRadius: avatarSize / 2,
+        },
+      ]}
+    >
+      <Text style={[styles.avatarText, { fontSize: avatarSize / 2.5 }]}>
+        {userName.charAt(0).toUpperCase()}
+      </Text>
+    </View>
+  );
+
   return (
     <View style={[styles.headerLeft, style]}>
-      {useProfileImage ? (
-        <Image
-          source={require("../assets/Icons/DefaultProfile.png")}
-          style={[
-            styles.avatarImage,
-            {
-              width: avatarSize,
-              height: avatarSize,
-              borderRadius: avatarSize / 3,
-            },
-          ]}
-          resizeMode="cover"
-        />
+      {onProfilePress ? (
+        <TouchableOpacity onPress={onProfilePress} activeOpacity={0.7}>
+          {avatarContent}
+        </TouchableOpacity>
       ) : (
-        <View
-          style={[
-            styles.avatarContainer,
-            {
-              width: avatarSize,
-              height: avatarSize,
-              borderRadius: avatarSize / 2,
-            },
-          ]}
-        >
-          <Text style={[styles.avatarText, { fontSize: avatarSize / 2.5 }]}>
-            {userName.charAt(0).toUpperCase()}
-          </Text>
-        </View>
+        avatarContent
       )}
       <View style={styles.textContainer}>
         <Text style={styles.greetingText}>{greetingText}</Text>
