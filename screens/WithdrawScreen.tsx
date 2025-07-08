@@ -16,6 +16,7 @@ import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../types";
 import Text from "../components/Text";
 import { BlurView } from "expo-blur";
+import { SuccessIcon } from "../components/LottieIcon";
 
 export default function WithdrawScreen() {
   const insets = useSafeAreaInsets();
@@ -78,12 +79,12 @@ export default function WithdrawScreen() {
   const handleConfirmWithdraw = () => {
     setShowConfirmModal(false);
     setShowReviewModal(true);
-    
+
     // Clear any existing timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    
+
     // Automatically hide the success message after 4 seconds
     timeoutRef.current = setTimeout(() => {
       setShowReviewModal(false);
@@ -94,7 +95,7 @@ export default function WithdrawScreen() {
   return (
     <OnboardingBackground style={styles.container}>
       <StatusBar style="light" translucent backgroundColor="transparent" />
-      <View style={[styles.statusBarBackground, { height: insets.top }]} />
+      <View style={styles.statusBarBackground} />
 
       <ScrollView
         style={styles.scrollContainer}
@@ -236,9 +237,7 @@ export default function WithdrawScreen() {
                     onPress={() => handleNetworkSelect(network)}
                   >
                     <Text style={styles.networkOptionText}>{network}</Text>
-                    {selectedNetwork === network && (
-                      <Ionicons name="checkmark" size={20} color="#3B82F6" />
-                    )}
+                    {selectedNetwork === network && <SuccessIcon size={20} />}
                   </TouchableOpacity>
                 ))}
               </ScrollView>
@@ -350,7 +349,7 @@ export default function WithdrawScreen() {
           <View style={styles.reviewModal}>
             <View style={styles.reviewIconContainer}>
               <View style={styles.checkmarkCircle}>
-                <Ionicons name="checkmark" size={40} color="#3B82F6" />
+                <SuccessIcon size={40} />
               </View>
             </View>
 

@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-} from "react-native";
+import { View, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -13,11 +7,14 @@ import { OnboardingBackground } from "../components/UniversalBackground";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../types";
 import Text from "../components/Text";
+import { SuccessIcon } from "../components/LottieIcon";
+import { useAlert } from "../context/AlertContext";
 
 export default function CreateCardScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [selectedCardType, setSelectedCardType] = useState<string | null>(null);
+  const { showError } = useAlert();
 
   const cardTypes = [
     {
@@ -45,7 +42,7 @@ export default function CreateCardScreen() {
 
   const handleCreateCard = () => {
     if (!selectedCardType) {
-      Alert.alert("Please select a card type");
+      showError("Please select a card type");
       return;
     }
 
@@ -105,9 +102,7 @@ export default function CreateCardScreen() {
                     {cardType.description}
                   </Text>
                 </View>
-                {selectedCardType === cardType.id && (
-                  <Ionicons name="checkmark-circle" size={24} color="#3B82F6" />
-                )}
+                {selectedCardType === cardType.id && <SuccessIcon size={24} />}
               </TouchableOpacity>
             ))}
           </View>

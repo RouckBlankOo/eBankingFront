@@ -6,7 +6,6 @@ import { NavigationProp, useNavigation } from "@react-navigation/native";
 // Import reusable components
 import React, { useState } from "react";
 import {
-  Alert,
   Dimensions,
   FlatList,
   ScrollView,
@@ -28,6 +27,7 @@ import { UserHeader } from "../components/UserHeader";
 import { VerificationBanner } from "../components/VerificationBanner";
 import { RootStackParamList } from "../types";
 import MoreOptionsModal, { MoreOption } from "../components/MoreOptionsModal";
+import { useAlert } from "../context/AlertContext";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -68,6 +68,7 @@ const HomeScreen = () => {
   const insets = useSafeAreaInsets();
   const { isProfileComplete } = useUser();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { showInfo } = useAlert();
 
   // State for more options modal
   const [moreOptionsModalVisible, setMoreOptionsModalVisible] = useState(false);
@@ -115,7 +116,7 @@ const HomeScreen = () => {
     switch (actionName) {
       case "convert":
         // TODO: Navigate to conversion screen or show conversion modal
-        Alert.alert("Convert", "Convert between different currencies");
+        showInfo("Convert", "Convert between different currencies");
         break;
       case "withdraw":
         // Navigate to withdrawal screen
@@ -123,11 +124,11 @@ const HomeScreen = () => {
         break;
       case "scan":
         // TODO: Open QR scanner
-        Alert.alert("Scan QR Code", "Scan QR code to send or receive funds");
+        showInfo("Scan QR Code", "Scan QR code to send or receive funds");
         break;
       case "gift":
         // TODO: Navigate to gift screen
-        Alert.alert("Gift", "Send cryptocurrency as a gift to someone");
+        showInfo("Gift", "Send cryptocurrency as a gift to someone");
         break;
       default:
         break;

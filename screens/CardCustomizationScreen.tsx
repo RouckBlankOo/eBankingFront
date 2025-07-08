@@ -4,7 +4,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Alert,
   TextInput,
   Modal,
 } from "react-native";
@@ -22,6 +21,7 @@ import {
 import { RootStackParamList } from "../types";
 import Text from "../components/Text";
 import { useUser } from "../context/UserContext";
+import { useAlert } from "../context/AlertContext";
 
 type CardCustomizationRouteProp = RouteProp<
   RootStackParamList,
@@ -34,6 +34,7 @@ export default function CardCustomizationScreen() {
   const route = useRoute<CardCustomizationRouteProp>();
   const { cardType } = route.params;
   const { addCard } = useUser();
+  const { showSuccess, showError } = useAlert();
 
   const [selectedGradient, setSelectedGradient] = useState(0);
   const [cardName, setCardName] = useState(
@@ -76,19 +77,15 @@ export default function CardCustomizationScreen() {
     // Add the card to the context
     addCard(newCard);
 
-    Alert.alert(
+    showSuccess(
       "Card Created",
-      `Your customized ${cardType} card "${cardName}" has been created successfully!`,
-      [
-        {
-          text: "OK",
-          onPress: () => {
-            // Navigate back to the cards screen
-            navigation.navigate("MainApp");
-          },
-        },
-      ]
+      `Your customized ${cardType} card "${cardName}" has been created successfully!`
     );
+
+    // Navigate back to the cards screen after showing success
+    setTimeout(() => {
+      navigation.navigate("MainApp");
+    }, 3000); // Wait for success alert to auto-close
   };
 
   const handleCustomNameSave = () => {
@@ -98,7 +95,7 @@ export default function CardCustomizationScreen() {
       setShowNameInput(false);
       setCustomCardName("");
     } else {
-      Alert.alert("Invalid Name", "Please enter a valid card name.");
+      showError("Invalid Name", "Please enter a valid card name.");
     }
   };
 

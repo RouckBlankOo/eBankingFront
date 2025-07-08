@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-} from "react-native";
+import { View, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -18,6 +12,7 @@ import {
   useRoute,
 } from "@react-navigation/native";
 import { RootStackParamList } from "../types";
+import { useAlert } from "../context/AlertContext";
 import Text from "../components/Text";
 
 type ChooseCardRouteProp = RouteProp<RootStackParamList, "ChooseCard">;

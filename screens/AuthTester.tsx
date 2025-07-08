@@ -4,12 +4,14 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import Text from "../components/Text";
 import { CONSTANTS } from "../constants/index";
+import { useAlert } from "../context/AlertContext";
+import { OnboardingBackground } from "../components/UniversalBackground";
 
 const AuthTester = () => {
   const [email, setEmail] = useState("test@example.com");
@@ -19,6 +21,7 @@ const AuthTester = () => {
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState("");
   const [response, setResponse] = useState("");
+  const { showSuccess, showError } = useAlert();
 
   const API_URL = CONSTANTS.API_URL_DEV || CONSTANTS.API_URL_PROD;
 
@@ -32,10 +35,11 @@ const AuthTester = () => {
       const data = await res.json();
       console.log("Health check response data:", data);
       setResponse(JSON.stringify(data, null, 2));
-      Alert.alert(
-        "Health Check",
-        res.ok ? "Backend is running!" : "Backend error"
-      );
+      if (res.ok) {
+        showSuccess("Health Check", "Backend is running!");
+      } else {
+        showError("Health Check", "Backend error");
+      }
     } catch (error: any) {
       console.error("Health check error:", error);
       setResponse(`Error: ${error.message}`);
@@ -68,8 +72,8 @@ const AuthTester = () => {
       const data = await res.json();
       setResponse(JSON.stringify(data, null, 2));
       if (res.ok) {
-        Alert.alert(
-          "Success",
+        showSuccess(
+          "Registration Success",
           "User registered! Check console for verification codes."
         );
       } else {
@@ -108,7 +112,7 @@ const AuthTester = () => {
       setResponse(JSON.stringify(data, null, 2));
       if (res.ok && data.token) {
         setToken(data.token);
-        Alert.alert("Success", "Login successful! Token saved.");
+        showSuccess("Success", "Login successful! Token saved.");
       } else {
         Alert.alert("Login Error", data.message || "Login failed");
       }
@@ -141,7 +145,7 @@ const AuthTester = () => {
       const data = await res.json();
       setResponse(JSON.stringify(data, null, 2));
       if (res.ok) {
-        Alert.alert("Success", "Profile retrieved successfully!");
+        showSuccess("Success", "Profile retrieved successfully!");
       } else {
         Alert.alert("Profile Error", data.message || "Failed to get profile");
       }
@@ -155,110 +159,113 @@ const AuthTester = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Authentication Tester</Text>
-      <Text style={styles.subtitle}>API URL: {API_URL}</Text>
+    <OnboardingBackground style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        <Text style={styles.title}>Authentication Tester</Text>
+        <Text style={styles.subtitle}>API URL: {API_URL}</Text>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Test Data</Text>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Full Name"
-          value={fullName}
-          onChangeText={setFullName}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Phone Number"
-          value={phoneNumber}
-          onChangeText={setPhoneNumber}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Tests</Text>
-
-        <TouchableOpacity
-          style={styles.button}
-          onPress={testHealthCheck}
-          disabled={loading}
-        >
-          <Text style={styles.buttonText}>1. Test Health Check</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.button}
-          onPress={testRegister}
-          disabled={loading}
-        >
-          <Text style={styles.buttonText}>2. Test Register</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.button}
-          onPress={testLogin}
-          disabled={loading}
-        >
-          <Text style={styles.buttonText}>3. Test Login</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.button, !token && styles.buttonDisabled]}
-          onPress={testGetProfile}
-          disabled={loading || !token}
-        >
-          <Text style={styles.buttonText}>4. Test Get Profile</Text>
-        </TouchableOpacity>
-      </View>
-
-      {token && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Token</Text>
-          <Text style={styles.token}>{token.substring(0, 50)}...</Text>
-        </View>
-      )}
+          <Text style={styles.sectionTitle}>Test Data</Text>
 
-      {loading && (
-        <View style={styles.loading}>
-          <ActivityIndicator size="large" color="#007bff" />
-          <Text>Testing...</Text>
-        </View>
-      )}
+          <TextInput
+            style={styles.input}
+            placeholder="Full Name"
+            value={fullName}
+            onChangeText={setFullName}
+          />
 
-      {response && (
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Phone Number"
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+        </View>
+
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Response</Text>
-          <Text style={styles.response}>{response}</Text>
+          <Text style={styles.sectionTitle}>Tests</Text>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={testHealthCheck}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>1. Test Health Check</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={testRegister}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>2. Test Register</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={testLogin}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>3. Test Login</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.button, !token && styles.buttonDisabled]}
+            onPress={testGetProfile}
+            disabled={loading || !token}
+          >
+            <Text style={styles.buttonText}>4. Test Get Profile</Text>
+          </TouchableOpacity>
         </View>
-      )}
-    </ScrollView>
+
+        {token && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Token</Text>
+            <Text style={styles.token}>{token.substring(0, 50)}...</Text>
+          </View>
+        )}
+
+        {loading && (
+          <View style={styles.loading}>
+            <ActivityIndicator size="large" color="#007bff" />
+            <Text>Testing...</Text>
+          </View>
+        )}
+
+        {response && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Response</Text>
+            <Text style={styles.response}>{response}</Text>
+          </View>
+        )}
+      </ScrollView>
+    </OnboardingBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollView: {
     padding: 20,
-    backgroundColor: "#fff",
   },
   title: {
     fontSize: 24,

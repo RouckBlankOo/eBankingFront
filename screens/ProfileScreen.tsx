@@ -5,7 +5,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
@@ -16,33 +15,29 @@ import Text from "../components/Text";
 import { useUser } from "../context/UserContext";
 import { RootStackParamList } from "../types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAlert } from "../context/AlertContext";
 
 const ProfileScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { logout } = useUser();
+  const { showDestructiveConfirm, showError, showInfo } = useAlert();
 
   const handleLogout = async () => {
-    Alert.alert("Logout", "Are you sure you want to logout?", [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-      {
-        text: "Logout",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await AsyncStorage.removeItem("jwtToken");
-            logout();
-            navigation.navigate("Login" as never);
-          } catch (error) {
-            console.error("Logout error:", error);
-            Alert.alert("Error", "Failed to logout properly");
-          }
-        },
-      },
-    ]);
+    showDestructiveConfirm(
+      "Logout",
+      "Are you sure you want to logout?",
+      async () => {
+        try {
+          await AsyncStorage.removeItem("jwtToken");
+          logout();
+          navigation.navigate("Login" as never);
+        } catch (error) {
+          console.error("Logout error:", error);
+          showError("Error", "Failed to logout properly");
+        }
+      }
+    );
   };
 
   const handleBack = () => {
@@ -51,32 +46,32 @@ const ProfileScreen = () => {
 
   const handleProfilePress = () => {
     // Navigate to profile details/edit screen
-    Alert.alert("Profile", "Profile editing coming soon!");
+    showInfo("Profile", "Profile editing coming soon!");
   };
 
   const handleReferencePress = () => {
     // Navigate to referral screen
-    Alert.alert("Reference", "Referral system coming soon!");
+    showInfo("Reference", "Referral system coming soon!");
   };
 
   const handleSecurityPress = () => {
     // Navigate to security settings
-    Alert.alert("Security", "Security settings coming soon!");
+    navigation.navigate("Security" as never);
   };
 
   const handleSettingsPress = () => {
     // Navigate to general settings
-    Alert.alert("Settings", "General settings coming soon!");
+    showInfo("Settings", "General settings coming soon!");
   };
 
   const handleHelpPress = () => {
     // Navigate to help/support
-    Alert.alert("Help", "Help & support coming soon!");
+    showInfo("Help", "Help & support coming soon!");
   };
 
   const handleMorePress = () => {
     // Navigate to more options
-    Alert.alert("More", "More options coming soon!");
+    showInfo("More", "More options coming soon!");
   };
 
   // Remove unused functions
@@ -364,11 +359,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   referenceSection: {
-    backgroundColor: "rgba(59, 130, 246, 0.1)",
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
     borderRadius: 16,
     marginHorizontal: 20,
     marginVertical: 10,
-    padding: 16,
+    padding: 20,
     borderWidth: 1,
     borderColor: "rgba(59, 130, 246, 0.2)",
   },
@@ -426,7 +421,7 @@ const styles = StyleSheet.create({
   },
   menuItem: {
     backgroundColor: "rgba(255, 255, 255, 0.05)",
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 16,
     flexDirection: "row",
     alignItems: "center",

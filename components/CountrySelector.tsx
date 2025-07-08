@@ -10,6 +10,7 @@ import {
 import Text from "./Text";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
+import { SuccessIcon } from "./LottieIcon";
 
 const { width, height } = Dimensions.get("window");
 
@@ -146,9 +147,7 @@ const CountrySelector: React.FC<CountrySelectorProps> = ({
                 >
                   <Text style={styles.countryItemFlag}>{item.flag}</Text>
                   <Text style={styles.countryItemName}>{item.name}</Text>
-                  {selectedCountry === item.name && (
-                    <Ionicons name="checkmark" size={20} color="#3B82F6" />
-                  )}
+                  {selectedCountry === item.name && <SuccessIcon size={20} />}
                 </TouchableOpacity>
               )}
             />

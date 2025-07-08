@@ -37,4 +37,10 @@ export type RootStackParamList = {
   ChooseCard: { cardType: "virtual" | "premium" };
   CardCustomization: { cardType: "virtual" | "premium" };
   ProfileScreen: undefined;
+  Security: undefined;
+  Devices: undefined;
+  ChangePassword: undefined;
+  ChangeEmail: undefined;
+  EmailVerification: { newEmail: string; oldEmail: string; phoneNumber: string };
+  AccountCreationSuccess: { country?: 'Tunisia' | 'USA' | 'UK' | 'UAE'; email?: string };
 };

@@ -2,7 +2,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -18,10 +17,12 @@ import { useUser } from "../context/UserContext";
 import { RootStackParamList } from "../types";
 import CountrySelector from "../components/CountrySelector";
 import CountryInput from "../components/CountryInput";
+import { useAlert } from "../context/AlertContext";
 
 const AddressInformationScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { updateProfileStatus } = useUser();
+  const { showError } = useAlert();
   const [country, setCountry] = useState("Tunisia");
   const [isCountryModalVisible, setCountryModalVisible] = useState(false);
   const [streetAddress, setStreetAddress] = useState("example");
@@ -37,7 +38,7 @@ const AddressInformationScreen = () => {
   const handleContinue = () => {
     // Basic validation
     if (!country || !streetAddress || !city || !postalCode) {
-      Alert.alert("Error", "Please fill in all required fields");
+      showError("Error", "Please fill in all required fields");
       return;
     }
 

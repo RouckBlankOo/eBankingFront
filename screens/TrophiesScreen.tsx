@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SuccessIcon } from "../components/LottieIcon";
 
 interface Trophy {
   id: string;
@@ -83,7 +84,7 @@ const TrophiesScreen = () => {
       </View>
       {trophy.earned && (
         <View style={styles.earnedBadge}>
-          <Ionicons name="checkmark-circle" size={20} color="#00D4AA" />
+          <SuccessIcon size={20} />
         </View>
       )}
     </View>

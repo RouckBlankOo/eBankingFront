@@ -2,7 +2,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -14,11 +13,13 @@ import {
 } from "react-native";
 import Text from "../components/Text";
 import { OnboardingBackground } from "../components/UniversalBackground";
+import { useAlert } from "../context/AlertContext";
 
 type DocumentType = "passport" | "driving" | "national";
 
 const DocumentUploadScreen = () => {
   const navigation = useNavigation();
+  const { showError, showConfirm, showInfo } = useAlert();
   const [selectedDocument, setSelectedDocument] =
     useState<DocumentType>("driving");
   const [documentNumber, setDocumentNumber] = useState(
@@ -31,17 +32,18 @@ const DocumentUploadScreen = () => {
   const handleContinue = () => {
     // Basic validation
     if (!documentNumber || !issuingCountry || !nationality) {
-      Alert.alert("Error", "Please fill in all required fields");
+      showError("Error", "Please fill in all required fields");
       return;
     }
 
     // Navigate back to main app or show success
-    Alert.alert("Success", "Identity verification completed successfully!", [
-      {
-        text: "OK",
-        onPress: () => navigation.navigate("MainApp" as never),
-      },
-    ]);
+    showConfirm(
+      "Success",
+      "Identity verification completed successfully!",
+      () => navigation.navigate("MainApp" as never),
+      undefined,
+      "OK"
+    );
   };
 
   const handleBackPress = () => {
@@ -53,11 +55,11 @@ const DocumentUploadScreen = () => {
   };
 
   const handleCountrySelect = (type: "issuing" | "nationality") => {
-    Alert.alert("Country Selection", "Country selection feature coming soon");
+    showInfo("Country Selection", "Country selection feature coming soon");
   };
 
   const handleAddPhoto = (photoType: string) => {
-    Alert.alert("Add Photo", `${photoType} upload feature coming soon`);
+    showInfo("Add Photo", `${photoType} upload feature coming soon`);
   };
 
   const renderDocumentOption = (
@@ -308,8 +310,8 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   documentOption: {
-    backgroundColor: "rgba(30, 41, 59, 0.6)",
-    borderRadius: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    borderRadius: 16,
     padding: 16,
     marginBottom: 12,
     flexDirection: "row",
@@ -324,7 +326,7 @@ const styles = StyleSheet.create({
   documentIcon: {
     width: 60,
     height: 60,
-    borderRadius: 12,
+    borderRadius: 16,
     backgroundColor: "rgba(255, 255, 255, 0.05)",
     justifyContent: "center",
     alignItems: "center",
@@ -360,8 +362,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    backgroundColor: "rgba(30, 41, 59, 0.6)",
-    borderRadius: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    borderRadius: 16,
     padding: 16,
     color: "#FFFFFF",
     fontSize: 16,
@@ -377,8 +379,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   countryContainer: {
-    backgroundColor: "rgba(30, 41, 59, 0.6)",
-    borderRadius: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    borderRadius: 16,
     padding: 16,
     flexDirection: "row",
     alignItems: "center",
@@ -409,8 +411,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   dateInputContainer: {
-    backgroundColor: "rgba(30, 41, 59, 0.6)",
-    borderRadius: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.1)",
   },
@@ -432,8 +434,8 @@ const styles = StyleSheet.create({
   photoUploadIcon: {
     width: 80,
     height: 80,
-    borderRadius: 12,
-    backgroundColor: "rgba(30, 41, 59, 0.6)",
+    borderRadius: 16,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
     borderWidth: 2,
     borderColor: "#3B82F6",
     borderStyle: "dashed",

@@ -4,7 +4,6 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   Image,
   Modal,
 } from "react-native";
@@ -20,11 +19,13 @@ import {
 import { RootStackParamList } from "../types";
 import QRCode from "react-native-qrcode-svg";
 import { BlurView } from "expo-blur";
+import { useAlert } from "../context/AlertContext";
 
 export default function DepositScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute();
+  const { showSuccess, showInfo } = useAlert();
 
   // Get the selected currency from navigation params
   const params = route.params as any;
@@ -111,15 +112,15 @@ export default function DepositScreen() {
       // Try to use expo-clipboard if available
       const { setStringAsync } = await import("expo-clipboard");
       await setStringAsync(walletAddress);
-      Alert.alert("Copied!", "Wallet address copied to clipboard");
+      showSuccess("Copied!", "Wallet address copied to clipboard");
     } catch {
       // Fallback: just show a success message
-      Alert.alert("Copied!", "Wallet address copied to clipboard");
+      showSuccess("Copied!", "Wallet address copied to clipboard");
     }
   };
 
   const handleShare = () => {
-    Alert.alert(
+    showInfo(
       "Share",
       `Sharing deposit information for ${selectedCurrency.symbol}`
     );

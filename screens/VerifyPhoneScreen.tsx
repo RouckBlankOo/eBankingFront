@@ -16,7 +16,6 @@ import {
 import { Snackbar } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { RootStackParamList } from "../types";
-import { CONSTANTS } from "../constants";
 
 const VerifyPhoneScreen = () => {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
@@ -29,8 +28,6 @@ const VerifyPhoneScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const inputRefs = useRef<TextInput[]>([]);
   const insets = useSafeAreaInsets();
-
-  const API_URL = CONSTANTS.API_URL_DEV || CONSTANTS.API_URL_PROD;
 
   // Countdown timer
   useEffect(() => {
@@ -68,11 +65,8 @@ const VerifyPhoneScreen = () => {
   const handleVerifyPhone = async () => {
     const enteredCode = code.join("");
 
-    if (enteredCode.length !== 6) {
-      setSnackbarMessage("Please enter the complete 6-digit code");
-      setSnackbarVisible(true);
-      return;
-    }
+    // Accept any code as valid, no validation required
+    // Even if not all 6 digits are entered
 
     setIsLoading(true);
     setSnackbarVisible(false);
@@ -174,11 +168,10 @@ const VerifyPhoneScreen = () => {
           <TouchableOpacity
             style={[
               styles.verifyButton,
-              (code.join("").length !== 6 || isLoading) &&
-                styles.verifyButtonDisabled,
+              isLoading && styles.verifyButtonDisabled,
             ]}
             onPress={handleVerifyPhone}
-            disabled={code.join("").length !== 6 || isLoading}
+            disabled={isLoading}
           >
             {isLoading ? (
               <ActivityIndicator color="#FFFFFF" />

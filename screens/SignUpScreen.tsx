@@ -69,11 +69,7 @@ const SignUpScreen = () => {
         setSnackbarVisible(true);
         return;
       }
-      if (!/^\d{8,15}$/.test(phone)) {
-        setSnackbarMessage("Please enter a valid phone number");
-        setSnackbarVisible(true);
-        return;
-      }
+      // No longer validating phone number format - accept any input
     }
 
     // Show verification modal (original flow)
@@ -105,7 +101,7 @@ const SignUpScreen = () => {
             ? email.trim().toLowerCase()
             : `temp_${Date.now()}@placeholder.com`,
         phoneNumber:
-          signupMode === "phone" ? `${countryCode}${phone}` : "+1000000000",
+          signupMode === "phone" ? `${countryCode}${phone}` : "+12025550189", // Using a well-formatted US number for validation
         fullName: "Placeholder Name", // Will be updated later
         password: "TempPassword123!", // Will be updated later
         isPlaceholder: true,

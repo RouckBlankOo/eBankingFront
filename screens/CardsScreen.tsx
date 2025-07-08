@@ -9,7 +9,6 @@ import {
   Image,
   Modal,
   TextInput,
-  Alert,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
@@ -20,6 +19,7 @@ import { OnboardingBackground } from "../components/UniversalBackground";
 import { UserHeader } from "../components/UserHeader";
 import Text from "../components/Text";
 import MoreOptionsModal, { MoreOption } from "../components/MoreOptionsModal";
+import { useAlert } from "../context/AlertContext";
 import { RootStackParamList } from "../types";
 import { useUser, Card } from "../context/UserContext";
 
@@ -41,10 +41,14 @@ interface Transaction {
   time: string;
 }
 
-export default function CardsScreen() {
+function CardsScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { cards, updateCard, deleteCard } = useUser();
+
+  // Custom alert hook
+  const { showSuccess, showError, showInfo, showDestructiveConfirm } =
+    useAlert();
 
   // State for managing cards and UI
   const [selectedCardId, setSelectedCardId] = useState<string>(
@@ -60,23 +64,26 @@ export default function CardsScreen() {
   const [changeNameModalVisible, setChangeNameModalVisible] = useState(false);
   const [newCardName, setNewCardName] = useState("");
 
-  // Get selected card
-  const selectedCard = cards.find((card) => card.id === selectedCardId);
+  // Get selected card - memoized for performance
+  const selectedCard = useMemo(
+    () => cards.find((card) => card.id === selectedCardId),
+    [cards, selectedCardId]
+  );
 
-  // Combine cards with get card option
-  const cardsWithGetCardOption: CardOrGetCard[] = [
-    ...cards,
-    { id: "get-card", type: "get-card" } as GetCardOption,
-  ];
+  // Combine cards with get card option - memoized for performance
+  const cardsWithGetCardOption: CardOrGetCard[] = useMemo(
+    () => [...cards, { id: "get-card", type: "get-card" } as GetCardOption],
+    [cards]
+  );
 
   // Card action functions
   const handleFreezeCard = useCallback(() => {
     if (selectedCard) {
       updateCard(selectedCardId, { isFrozen: !selectedCard.isFrozen });
       const action = selectedCard.isFrozen ? "unfrozen" : "frozen";
-      Alert.alert("Card Status", `Card has been ${action}`);
+      showSuccess("Card Status", `Card has been ${action}`, 3000);
     }
-  }, [selectedCard, selectedCardId, updateCard]);
+  }, [selectedCard, selectedCardId, updateCard, showSuccess]);
 
   const handleToggleSensitiveInfo = useCallback(() => {
     if (selectedCard) {
@@ -89,73 +96,74 @@ export default function CardsScreen() {
     setLimitModalVisible(true);
   };
 
-  const handleSetLimit = () => {
+  const handleSetLimit = useCallback(() => {
     const limitValue = parseFloat(newLimit);
     if (isNaN(limitValue) || limitValue <= 0) {
-      Alert.alert("Invalid Limit", "Please enter a valid positive number");
+      showError("Invalid Limit", "Please enter a valid positive number");
       return;
     }
 
     updateCard(selectedCardId, { limit: limitValue });
 
     setLimitModalVisible(false);
-    Alert.alert("Limit Updated", `Card limit set to $${limitValue.toFixed(2)}`);
-  };
+    showSuccess(
+      "Limit Updated",
+      `Card limit set to $${limitValue.toFixed(2)}`,
+      3000
+    );
+  }, [newLimit, selectedCardId, updateCard, showError, showSuccess]);
 
   // More button actions
   const handleMoreButton = () => {
     setMoreModalVisible(true);
   };
 
-  const handleChangeName = () => {
+  const handleChangeName = useCallback(() => {
     setNewCardName(selectedCard?.name || selectedCard?.type || "");
     setChangeNameModalVisible(true);
-  };
+  }, [selectedCard]);
 
-  const handleConfirmChangeName = () => {
+  const handleConfirmChangeName = useCallback(() => {
     if (!newCardName.trim()) {
-      Alert.alert("Invalid Name", "Please enter a valid card name");
+      showError("Invalid Name", "Please enter a valid card name");
       return;
     }
 
     updateCard(selectedCardId, { name: newCardName.trim() });
 
     setChangeNameModalVisible(false);
-    Alert.alert("Name Updated", `Card name changed to "${newCardName.trim()}"`);
-  };
+    showSuccess(
+      "Name Updated",
+      `Card name changed to "${newCardName.trim()}"`,
+      3000
+    );
+  }, [newCardName, selectedCardId, updateCard, showError, showSuccess]);
 
-  const handleEditCardDesign = () => {
-    Alert.alert("Edit Design", "Card design editor coming soon!");
-  };
+  const handleEditCardDesign = useCallback(() => {
+    showInfo("Edit Design", "Card design editor coming soon!");
+  }, [showInfo]);
 
-  const handleDeleteCard = () => {
-    Alert.alert(
+  const handleDeleteCard = useCallback(() => {
+    showDestructiveConfirm(
       "Delete Card",
       "Are you sure you want to delete this card? This action cannot be undone.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => {
-            deleteCard(selectedCardId);
+      () => {
+        deleteCard(selectedCardId);
 
-            // Select the first remaining card or reset if no cards left
-            const remainingCards = cards.filter(
-              (card) => card.id !== selectedCardId
-            );
-            if (remainingCards.length > 0) {
-              setSelectedCardId(remainingCards[0].id);
-            } else {
-              setSelectedCardId("");
-            }
+        // Select the first remaining card or reset if no cards left
+        const remainingCards = cards.filter(
+          (card) => card.id !== selectedCardId
+        );
+        if (remainingCards.length > 0) {
+          setSelectedCardId(remainingCards[0].id);
+        } else {
+          setSelectedCardId("");
+        }
 
-            Alert.alert("Card Deleted", "Card has been successfully deleted");
-          },
-        },
-      ]
+        showSuccess("Card Deleted", "Card has been successfully deleted", 3000);
+      }
     );
-  };
+  }, [selectedCardId, cards, deleteCard, showDestructiveConfirm, showSuccess]);
 
   // Card more options configuration
   const cardMoreOptions: MoreOption[] = [
@@ -273,6 +281,9 @@ export default function CardsScreen() {
         style={styles.scrollContainer}
         contentContainerStyle={{ paddingTop: insets.top + 1 }}
         showsVerticalScrollIndicator={false}
+        removeClippedSubviews={true}
+        keyboardShouldPersistTaps="handled"
+        scrollEventThrottle={16}
       >
         {/* Header */}
         <View style={styles.header}>
@@ -301,6 +312,16 @@ export default function CardsScreen() {
             snapToInterval={screenWidth - 60}
             decelerationRate="fast"
             bounces={false}
+            // Performance optimizations
+            removeClippedSubviews={true}
+            initialNumToRender={3}
+            maxToRenderPerBatch={3}
+            windowSize={5}
+            getItemLayout={(data, index) => ({
+              length: screenWidth - 60,
+              offset: (screenWidth - 60 + 16) * index,
+              index,
+            })}
           />
         </View>
 
@@ -407,6 +428,11 @@ export default function CardsScreen() {
               ItemSeparatorComponent={() => (
                 <View style={styles.transactionSeparator} />
               )}
+              // Performance optimizations
+              removeClippedSubviews={false} // Keep false for scrollEnabled={false}
+              initialNumToRender={10}
+              maxToRenderPerBatch={5}
+              windowSize={10}
             />
           )}
         </View>
@@ -931,3 +957,6 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 });
+
+// Export with React.memo for performance optimization
+export default React.memo(CardsScreen);

@@ -5,15 +5,17 @@
 
 import {
   ThemedButton,
-  ThemedInput,
   ThemedText,
   ThemedView,
 } from "@/components/ThemedComponents";
 import { useTheme } from "@/hooks/useTheme";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
-import { Alert } from "react-native";
+import { View, TextInput, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { CONSTANTS } from "../constants";
+import { useAlert } from "../context/AlertContext";
 
 type RootStackParamList = {
   Login: undefined;
@@ -25,10 +27,11 @@ const ForgotPasswordScreenThemed = () => {
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const theme = useTheme();
+  const { showError, showConfirm } = useAlert();
 
   const handleResetPassword = async () => {
     if (!email) {
-      Alert.alert("Error", "Please enter your email");
+      showError("Error", "Please enter your email");
       return;
     }
 
@@ -51,15 +54,19 @@ const ForgotPasswordScreenThemed = () => {
       console.log("Forgot Password Response:", data);
 
       if (data.success) {
-        Alert.alert("Success", data.message, [
-          { text: "OK", onPress: () => navigation.navigate("Login") },
-        ]);
+        showConfirm(
+          "Success",
+          data.message,
+          () => navigation.navigate("Login"),
+          undefined,
+          "OK"
+        );
       } else {
-        Alert.alert("Error", data.message);
+        showError("Error", data.message);
       }
     } catch (error) {
       console.error("Forgot Password Error:", error);
-      Alert.alert("Error", "Failed to send reset request. Please try again.");
+      showError("Error", "Failed to send reset request. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -94,15 +101,33 @@ const ForgotPasswordScreenThemed = () => {
         reset your password.
       </ThemedText>
 
-      <ThemedInput
-        label="Email Address"
-        placeholder="Enter your email"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        value={email}
-        onChangeText={setEmail}
-        style={{ marginBottom: theme.spacing.xl }}
-      />
+      <LinearGradient
+        colors={["rgba(255, 255, 255, 0.08)", "rgba(255, 255, 255, 0.03)"]}
+        style={styles.inputOuterContainer}
+      >
+        <View style={styles.inputContainer}>
+          <ThemedText variant="secondary" style={styles.label}>
+            Email Address
+          </ThemedText>
+          <View style={styles.inputWrapper}>
+            <Ionicons
+              name="mail"
+              size={20}
+              color="#3B82F6"
+              style={styles.inputIcon}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your email"
+              placeholderTextColor="rgba(255, 255, 255, 0.6)"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
+            />
+          </View>
+        </View>
+      </LinearGradient>
 
       <ThemedButton
         title="Reset Password"
@@ -114,5 +139,54 @@ const ForgotPasswordScreenThemed = () => {
     </ThemedView>
   );
 };
+
+const styles = StyleSheet.create({
+  inputOuterContainer: {
+    borderRadius: 16,
+    overflow: "hidden",
+    padding: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.08)",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 4,
+    marginBottom: 24,
+  },
+  inputContainer: {
+    marginBottom: 0,
+  },
+  label: {
+    fontSize: 16,
+    color: "#3B82F6",
+    fontWeight: "600",
+    marginBottom: 8,
+  },
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "transparent",
+    borderRadius: 0,
+    paddingHorizontal: 0,
+    paddingVertical: 12,
+    borderWidth: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255, 255, 255, 0.3)",
+  },
+  inputIcon: {
+    marginRight: 12,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: "#FFFFFF",
+    fontFamily: "monospace",
+    paddingVertical: 4,
+  },
+});
 
 export default ForgotPasswordScreenThemed;

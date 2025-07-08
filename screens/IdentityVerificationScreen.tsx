@@ -2,7 +2,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
-  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -19,6 +18,7 @@ import { useUser } from "../context/UserContext";
 import { RootStackParamList } from "../types";
 import CountrySelector from "../components/CountrySelector";
 import CountryInput from "../components/CountryInput";
+import { useAlert } from "../context/AlertContext";
 
 type DocumentType = "passport" | "driving" | "national";
 type CountrySelectType = "issuing" | "nationality";
@@ -26,6 +26,7 @@ type CountrySelectType = "issuing" | "nationality";
 const IdentityVerificationScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { updateProfileStatus } = useUser();
+  const { showError, showSuccess, showInfo, showConfirm } = useAlert();
   const [selectedDocument, setSelectedDocument] =
     useState<DocumentType>("passport");
   const [documentNumber, setDocumentNumber] = useState(
@@ -41,7 +42,7 @@ const IdentityVerificationScreen = () => {
   const handleContinue = () => {
     // Basic validation
     if (!documentNumber || !issuingCountry || !nationality) {
-      Alert.alert("Error", "Please fill in all required fields");
+      showError("Error", "Please fill in all required fields");
       return;
     }
 
@@ -49,12 +50,13 @@ const IdentityVerificationScreen = () => {
     updateProfileStatus("identityVerification", true);
 
     // Complete verification and go back to main app
-    Alert.alert("Success", "Identity verification completed successfully!", [
-      {
-        text: "OK",
-        onPress: () => navigation.navigate("MainApp"),
-      },
-    ]);
+    showConfirm(
+      "Success",
+      "Identity verification completed successfully!",
+      () => navigation.navigate("MainApp"),
+      undefined,
+      "OK"
+    );
   };
 
   const handleBackPress = () => {
@@ -79,7 +81,7 @@ const IdentityVerificationScreen = () => {
   };
 
   const handleAddPhoto = (photoType: string) => {
-    Alert.alert("Add Photo", `${photoType} upload feature coming soon`);
+    showInfo("Add Photo", `${photoType} upload feature coming soon`);
   };
 
   const renderDocumentOption = (
