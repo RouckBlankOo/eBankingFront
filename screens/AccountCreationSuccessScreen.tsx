@@ -13,7 +13,7 @@ import { RootStackParamList } from "../types";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
-type CountryType = 'Tunisia' | 'USA' | 'UK' | 'UAE';
+type CountryType = "Tunisia" | "USA" | "UK" | "UAE";
 
 type AccountCreationSuccessProps = {
   route: {
@@ -74,14 +74,12 @@ const AccountCreationSuccessScreen: React.FC<AccountCreationSuccessProps> = ({
         {/* Description Text */}
         <Text style={styles.description}>
           Thanks for your interest in joining Revolut in {country}! Leave your
-          email below and we&apos;ll let you know as soon as your account is ready
-          for you to sign up
+          email below and we&apos;ll let you know as soon as your account is
+          ready for you to sign up
         </Text>
 
         {/* Continue Button */}
-        <TouchableOpacity
-          onPress={handleContinue}
-        >
+        <TouchableOpacity onPress={handleContinue}>
           <LinearGradient
             colors={["#3B82F6", "#1D4ED8", "#1E40AF"]}
             start={{ x: 0, y: 0 }}

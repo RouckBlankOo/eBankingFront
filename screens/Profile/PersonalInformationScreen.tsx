@@ -11,13 +11,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Text from "../components/Text";
-import { OnboardingBackground } from "../components/UniversalBackground";
-import { useUser } from "../context/UserContext";
-import { RootStackParamList } from "../types";
-import CountrySelector from "../components/CountrySelector";
-import CountryInput from "../components/CountryInput";
-import { useAlert } from "../context/AlertContext";
+import Text from "../../components/Text";
+import { OnboardingBackground } from "../../components/UniversalBackground";
+import { useUser } from "../../context/UserContext";
+import { RootStackParamList } from "../../types";
+import CountrySelector from "../../components/CountrySelector";
+import CountryInput from "../../components/CountryInput";
+import { useAlert } from "../../context/AlertContext";
 
 const PersonalInformationScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();

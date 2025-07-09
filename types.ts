@@ -6,6 +6,8 @@ export type RootStackParamList = {
   ResetPassword: { userId: string; isEmailMode: boolean; scheme?: string };
   Dashboard: undefined;
   OnBoardingScreen: undefined;
+  Help: undefined;
+  Settings: undefined;
   CodeConfirmation: { 
     contactInfo: string; 
     signupMode: "phone" | "email"; 
@@ -33,6 +35,8 @@ export type RootStackParamList = {
   BankTransferDetails: { amount: string; currency: string; usdcAmount: string };
   BinancePay: { currency: { symbol: string; name: string; icon?: any } };
   Withdraw: undefined;
+  Send: undefined;
+  TransferAmount: { recipientType: "phone" | "email" | "uid"; recipientValue: string };
   CardTypes: undefined;
   ChooseCard: { cardType: "virtual" | "premium" };
   CardCustomization: { cardType: "virtual" | "premium" };
@@ -43,4 +47,12 @@ export type RootStackParamList = {
   ChangeEmail: undefined;
   EmailVerification: { newEmail: string; oldEmail: string; phoneNumber: string };
   AccountCreationSuccess: { country?: 'Tunisia' | 'USA' | 'UK' | 'UAE'; email?: string };
+  // Notification screens
+  Notifications: undefined;
+  AnnouncesScreen: undefined;
+  TransactionsNotificationsScreen: undefined;
+  LowBalanceScreen: undefined;
+  SystemNotificationsScreen: undefined;
+  QuickActionScreen: undefined;
+  InviteFriendsScreen: undefined;
 };

@@ -11,9 +11,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Text from "../components/Text";
-import { OnboardingBackground } from "../components/UniversalBackground";
-import { useAlert } from "../context/AlertContext";
+import Text from "../../components/Text";
+import { OnboardingBackground } from "../../components/UniversalBackground";
+import { useAlert } from "../../context/AlertContext";
 
 type DocumentType = "passport" | "driving" | "national";
 

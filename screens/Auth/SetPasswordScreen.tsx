@@ -107,7 +107,7 @@ const SetPasswordScreen = () => {
       // For demo, we'll create a dummy userId if missing
       const dummyUserId = `demo-${Date.now()}`;
       console.log(`Missing userId, using generated id: ${dummyUserId}`);
-      
+
       // Continue with the flow using the dummy userId
       try {
         await fetch(`${API_URL}/auth/set-password`, {
@@ -123,11 +123,11 @@ const SetPasswordScreen = () => {
       } catch (error) {
         console.warn("Error in set password, but continuing:", error);
       }
-      
+
       // Even if the above fails, we'll proceed to account creation success
       setSnackbarMessage("Password set successfully! Welcome to eBanking!");
       setSnackbarVisible(true);
-      
+
       // Get the country for the user based on their phone number or default to Tunisia
       const countryCode = contactInfo.includes("+")
         ? contactInfo.split(" ")[0]
@@ -150,7 +150,7 @@ const SetPasswordScreen = () => {
           email: contactInfo,
         });
       }, 2000);
-      
+
       return;
     }
 
@@ -176,7 +176,10 @@ const SetPasswordScreen = () => {
 
       // Even if there's an error, we'll proceed for demo purposes
       if (!response.ok) {
-        console.warn("Backend validation error, but proceeding anyway:", data.message);
+        console.warn(
+          "Backend validation error, but proceeding anyway:",
+          data.message
+        );
       }
 
       // Store JWT token if provided
@@ -231,7 +234,7 @@ const SetPasswordScreen = () => {
       // For demo purposes, we'll still continue to the success screen
       setSnackbarMessage("Account created successfully!");
       setSnackbarVisible(true);
-      
+
       // Get the country for the user based on their phone number or default to Tunisia
       const countryCode = contactInfo.includes("+")
         ? contactInfo.split(" ")[0]

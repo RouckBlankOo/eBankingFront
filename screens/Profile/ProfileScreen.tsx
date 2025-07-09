@@ -60,18 +60,18 @@ const ProfileScreen = () => {
   };
 
   const handleSettingsPress = () => {
-    // Navigate to general settings
-    showInfo("Settings", "General settings coming soon!");
+    // Navigate to settings screen
+    navigation.navigate("Settings");
   };
 
   const handleHelpPress = () => {
-    // Navigate to help/support
-    showInfo("Help", "Help & support coming soon!");
+    // Navigate to help/support screen
+    navigation.navigate("Help");
   };
 
   const handleMorePress = () => {
-    // Navigate to more options
-    showInfo("More", "More options coming soon!");
+    // Navigate to QuickActionScreen
+    navigation.navigate("QuickActionScreen");
   };
 
   // Remove unused functions

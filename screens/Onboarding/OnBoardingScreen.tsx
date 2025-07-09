@@ -9,9 +9,14 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import Text from "../components/Text";
-import { BorderRadius, Colors, Spacing, Typography } from "../constants/Theme";
-import { RootStackParamList } from "../types"; // Adjust the import path as necessary
+import Text from "../../components/Text";
+import {
+  BorderRadius,
+  Colors,
+  Spacing,
+  Typography,
+} from "../../constants/Theme";
+import { RootStackParamList } from "../../types"; // Adjust the import path as necessary
 
 const OnBoardingScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();

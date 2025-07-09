@@ -2,10 +2,10 @@ import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from "react";
-import CardsScreen from "./CardsScreen";
-import CoinWalletScreen from "./CoinWalletScreen";
+import CardsScreen from "../Cards/CardsScreen";
+import CoinWalletScreen from "../Transactions/CoinWalletScreen";
 import HomeScreen from "./HomeScreen";
-import ProfileScreen from "./ProfileScreen";
+import ProfileScreen from "../ProfileScreen";
 
 // Define valid icon names for TypeScript
 type IconName = "home" | "person" | "wallet" | "card";

@@ -15,13 +15,15 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
-import { OnboardingBackground } from "../components/UniversalBackground";
-import { UserHeader } from "../components/UserHeader";
-import Text from "../components/Text";
-import MoreOptionsModal, { MoreOption } from "../components/MoreOptionsModal";
-import { useAlert } from "../context/AlertContext";
-import { RootStackParamList } from "../types";
-import { useUser, Card } from "../context/UserContext";
+import { OnboardingBackground } from "../../components/UniversalBackground";
+import { UserHeader } from "../../components/UserHeader";
+import Text from "../../components/Text";
+import MoreOptionsModal, {
+  MoreOption,
+} from "../../components/MoreOptionsModal";
+import { useAlert } from "../../context/AlertContext";
+import { RootStackParamList } from "../../types";
+import { useUser, Card } from "../../context/UserContext";
 
 const { width: screenWidth } = Dimensions.get("window");
 

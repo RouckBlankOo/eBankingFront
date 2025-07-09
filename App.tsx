@@ -11,19 +11,19 @@ import SecurityVerificationScreen from "./components/SecurityVerificationScreen"
 import { UserProvider } from "./context/UserContext";
 import { AlertProvider } from "./context/AlertContext";
 import AppNavigator from "./navigator/AppNavigator";
-import AddressInformationScreen from "./screens/AddressInformationScreen";
+import AddressInformationScreen from "./screens/Profile/AddressInformationScreen";
 import AuthTester from "./screens/AuthTester";
 import BankTransferScreen from "./screens/BankTransferScreen";
 import BankTransferDetailsScreen from "./screens/BankTransferDetailsScreen";
 import BinancePayScreen from "./screens/BinancePayScreen";
 import CodeConfirmationScreen from "./screens/CodeConfirmationScreen";
 import DepositScreen from "./screens/DepositScreen";
-import DocumentUploadScreen from "./screens/DocumentUploadScreen";
+import DocumentUploadScreen from "./screens/Profile/DocumentUploadScreen";
 import ForgotPasswordScreen from "./screens/ForgotPasswordScreen";
-import IdentityVerificationScreen from "./screens/IdentityVerificationScreen";
+import IdentityVerificationScreen from "./screens/Profile/IdentityVerificationScreen";
 import LoginScreen from "./screens/LoginScreen";
-import OnBoardingScreen from "./screens/OnBoardingScreen";
-import PersonalInformationScreen from "./screens/PersonalInformationScreen";
+import OnBoardingScreen from "./screens/Onboarding/OnBoardingScreen";
+import PersonalInformationScreen from "./screens/Profile/PersonalInformationScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import SelectCurrencyScreen from "./screens/SelectCurrencyScreen";
 import SelectMethodScreen from "./screens/SelectMethodScreen";
@@ -31,7 +31,7 @@ import SetPasswordScreen from "./screens/SetPasswordScreen";
 import SignUpScreen from "./screens/SignUpScreen";
 import VerifyPhoneScreen from "./screens/VerifyPhoneScreen";
 import WithdrawScreen from "./screens/WithdrawScreen";
-import CardTypesScreen from "./screens/CardTypesScreen";
+import CardTypesScreen from "./screens/Cards/CardTypesScreen";
 import ChooseCardScreen from "./screens/ChooseCardScreen";
 import CardCustomizationScreen from "./screens/CardCustomizationScreen";
 import SecurityScreen from "./screens/SecurityScreen";
@@ -40,6 +40,17 @@ import ChangePasswordScreen from "./screens/ChangePasswordScreen";
 import ChangeEmailScreen from "./screens/ChangeEmailScreen";
 import EmailVerificationScreen from "./screens/EmailVerificationScreen";
 import AccountCreationSuccessScreen from "./screens/AccountCreationSuccessScreen";
+import HelpScreen from "./screens/HelpScreen";
+import SettingsScreen from "./screens/SettingsScreen";
+import SendScreen from "./screens/SendScreen";
+import TransferAmountScreen from "./screens/Transactions/TransferAmountScreen";
+import NotificationsScreen from "./screens/NotificationsScreen";
+import AnnouncesScreen from "./screens/AnnouncesScreen";
+import TransactionsNotificationsScreen from "./screens/TransactionsNotificationsScreen";
+import LowBalanceScreen from "./screens/LowBalanceScreen";
+import SystemNotificationsScreen from "./screens/SystemNotificationsScreen";
+import QuickActionScreen from "./screens/QuickActionScreen";
+import InviteFriendsScreen from "./screens/Referral/InviteFriendsScreen";
 
 // Enable react-native-screens for better performance
 enableScreens();
@@ -291,6 +302,104 @@ export default function App() {
                 name="ProfileScreen"
                 component={ProfileScreen}
                 options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Help"
+                component={HelpScreen}
+                options={{
+                  headerShown: false,
+                  ...TransitionPresets.SlideFromRightIOS,
+                }}
+              />
+              <Stack.Screen
+                name="Settings"
+                component={SettingsScreen}
+                options={{
+                  headerShown: false,
+                  ...TransitionPresets.SlideFromRightIOS,
+                }}
+              />
+              <Stack.Screen
+                name="Send"
+                component={SendScreen}
+                options={{
+                  headerShown: false,
+                  ...TransitionPresets.ModalPresentationIOS,
+                  gestureEnabled: true,
+                }}
+              />
+              <Stack.Screen
+                name="TransferAmount"
+                component={TransferAmountScreen}
+                options={{
+                  headerShown: false,
+                  ...TransitionPresets.SlideFromRightIOS,
+                  gestureEnabled: true,
+                }}
+              />
+              {/* Notification Screens */}
+              <Stack.Screen
+                name="Notifications"
+                component={NotificationsScreen}
+                options={{
+                  headerShown: false,
+                  ...TransitionPresets.SlideFromRightIOS,
+                  gestureEnabled: true,
+                }}
+              />
+              <Stack.Screen
+                name="AnnouncesScreen"
+                component={AnnouncesScreen}
+                options={{
+                  headerShown: false,
+                  ...TransitionPresets.SlideFromRightIOS,
+                  gestureEnabled: true,
+                }}
+              />
+              <Stack.Screen
+                name="TransactionsNotificationsScreen"
+                component={TransactionsNotificationsScreen}
+                options={{
+                  headerShown: false,
+                  ...TransitionPresets.SlideFromRightIOS,
+                  gestureEnabled: true,
+                }}
+              />
+              <Stack.Screen
+                name="LowBalanceScreen"
+                component={LowBalanceScreen}
+                options={{
+                  headerShown: false,
+                  ...TransitionPresets.SlideFromRightIOS,
+                  gestureEnabled: true,
+                }}
+              />
+              <Stack.Screen
+                name="SystemNotificationsScreen"
+                component={SystemNotificationsScreen}
+                options={{
+                  headerShown: false,
+                  ...TransitionPresets.SlideFromRightIOS,
+                  gestureEnabled: true,
+                }}
+              />
+              <Stack.Screen
+                name="QuickActionScreen"
+                component={QuickActionScreen}
+                options={{
+                  headerShown: false,
+                  ...TransitionPresets.SlideFromRightIOS,
+                  gestureEnabled: true,
+                }}
+              />
+              <Stack.Screen
+                name="InviteFriendsScreen"
+                component={InviteFriendsScreen}
+                options={{
+                  headerShown: false,
+                  ...TransitionPresets.SlideFromRightIOS,
+                  gestureEnabled: true,
+                }}
               />
             </Stack.Navigator>
           </NavigationContainer>

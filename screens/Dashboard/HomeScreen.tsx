@@ -15,19 +15,21 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ActionButton } from "../components/ActionButton";
-import { AnalyticsChart } from "../components/AnalyticsChart";
-import Text from "../components/Text";
-import { CurrencyCard } from "../components/CurrencyCard";
-import { DiscountsContent } from "../components/DiscountsContent";
-import { EmptyState } from "../components/EmptyState";
-import { ReferenceCard } from "../components/ReferenceCard";
-import { SectionContainer } from "../components/SectionContainer";
-import { UserHeader } from "../components/UserHeader";
-import { VerificationBanner } from "../components/VerificationBanner";
-import { RootStackParamList } from "../types";
-import MoreOptionsModal, { MoreOption } from "../components/MoreOptionsModal";
-import { useAlert } from "../context/AlertContext";
+import { ActionButton } from "../../components/ActionButton";
+import { AnalyticsChart } from "../../components/AnalyticsChart";
+import Text from "../../components/Text";
+import { CurrencyCard } from "../../components/CurrencyCard";
+import { DiscountsContent } from "../../components/DiscountsContent";
+import { EmptyState } from "../../components/EmptyState";
+import { ReferenceCard } from "../../components/ReferenceCard";
+import { SectionContainer } from "../../components/SectionContainer";
+import { UserHeader } from "../../components/UserHeader";
+import { VerificationBanner } from "../../components/VerificationBanner";
+import { RootStackParamList } from "../../types";
+import MoreOptionsModal, {
+  MoreOption,
+} from "../../components/MoreOptionsModal";
+import { useAlert } from "../../context/AlertContext";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -95,9 +97,12 @@ const HomeScreen = () => {
       } else if (actionName === "deposit") {
         // Navigate to Select Currency screen for deposit
         navigation.navigate("SelectCurrency");
+      } else if (actionName === "send") {
+        // Navigate to Send screen
+        navigation.navigate("Send");
       } else {
         console.log(`Performing action: ${actionName}`);
-        // TODO: Implement actual action handling for send, etc.
+        // TODO: Implement actual action handling for other actions
       }
     }
   };
@@ -263,14 +268,17 @@ const HomeScreen = () => {
             onProfilePress={handleProfilePress}
           />
           <View style={styles.headerRight}>
-            <TouchableOpacity style={styles.notificationButton}>
+            <TouchableOpacity
+              style={styles.notificationButton}
+              onPress={() => navigation.navigate("Notifications")}
+            >
               <Ionicons
                 name="notifications-outline"
                 size={24}
                 color="#FFFFFF"
               />
               <View style={styles.notificationBadge}>
-                <ThemedText style={styles.notificationCount}>0</ThemedText>
+                <ThemedText style={styles.notificationCount}>5</ThemedText>
               </View>
             </TouchableOpacity>
           </View>

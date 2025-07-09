@@ -128,11 +128,14 @@ const CodeConfirmationScreen = () => {
 
         // Even if there's a validation error, we'll proceed for demo purposes
         if (!response.ok) {
-          console.warn("Backend validation error, but proceeding anyway:", data.message);
-          
+          console.warn(
+            "Backend validation error, but proceeding anyway:",
+            data.message
+          );
+
           // If we got a userId in the response data despite errors, use it
           const fallbackUserId = data.data?.userId || `demo-${Date.now()}`;
-          
+
           // Show success message
           setSnackbarMessage(
             "Phone verified successfully! Please set your password."
@@ -147,7 +150,7 @@ const CodeConfirmationScreen = () => {
               userId: fallbackUserId,
             });
           }, 1500);
-          
+
           return;
         }
 

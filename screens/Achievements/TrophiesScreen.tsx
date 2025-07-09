@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { SuccessIcon } from "../components/LottieIcon";
+import { SuccessIcon } from "../../components/LottieIcon";
 
 interface Trophy {
   id: string;

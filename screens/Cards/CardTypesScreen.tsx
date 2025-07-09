@@ -4,10 +4,10 @@ import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { OnboardingBackground } from "../components/UniversalBackground";
+import { OnboardingBackground } from "../../components/UniversalBackground";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
-import Text from "../components/Text";
+import { RootStackParamList } from "../../types";
+import Text from "../../components/Text";
 
 export default function CardTypesScreen() {
   const insets = useSafeAreaInsets();

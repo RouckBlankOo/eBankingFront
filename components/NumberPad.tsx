@@ -40,7 +40,7 @@ export default function NumberPad({
 
   return (
     <LinearGradient
-      colors={["rgba(29, 36, 45, 1)", "rgba(29, 36, 45, 0.5)"]}
+      colors={["rgba(29, 36, 45, 0.9)", "rgba(21, 25, 32, 0.7)"]}
       style={[styles.container, style]}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
@@ -80,19 +80,20 @@ export default function NumberPad({
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 20,
-    padding: 16,
+    borderRadius: 16,
+    padding: 12,
+    width: "100%",
   },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 12,
+    marginBottom: 10,
   },
   button: {
-    width: (width - 80) / 3,
-    height: 55,
-    borderRadius: 15,
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    width: (width - 72) / 3, // Adjusted width calculation with reduced padding
+    height: 52, // Slightly reduced height
+    borderRadius: 12,
+    backgroundColor: "rgba(29, 36, 45, 0.8)",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -100,11 +101,11 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   backspaceButton: {
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    backgroundColor: "rgba(29, 36, 45, 0.8)",
   },
   buttonText: {
     fontSize: 22,
-    fontWeight: "400",
+    fontWeight: "500",
     color: "#FFFFFF",
   },
 });
